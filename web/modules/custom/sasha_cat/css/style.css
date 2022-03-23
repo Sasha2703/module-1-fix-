@@ -1,0 +1,159 @@
+
+.navbar-header{
+    margin: 0 10px;
+   width: 1000px;
+ }
+.page-header{
+  font-family: 'Poppins', sans-serif;
+  color: black;
+  font-size: 30px;
+  font-weight: 300;
+}
+.button{
+  box-shadow: 0 3px 5px  black;
+  background-color: #7a4ca9;
+  border-color: #7a4ca9;
+  text-decoration: none;
+}
+.button:hover {
+  box-shadow: 0 3px 5px  black;
+  background-color: #7a4ca9;
+  border-color: #7a4ca9;
+  text-decoration: none;
+}
+.button:active {
+  box-shadow: 0 3px 5px  black;
+  background-color: #7a4ca9;
+  border-color: #7a4ca9;
+  text-decoration: none;
+}
+.button:focus {
+  box-shadow: 0 3px 5px  black;
+  background-color: #7a4ca9;
+  border-color: #7a4ca9;
+  text-decoration: none;
+}
+
+.cat-table {
+  display: flex;
+  flex-direction: column;
+  border: 2px solid;
+  margin-top: 40px;
+  padding: 25px;
+  border-radius: 10px;
+  background-color: #d2c6df;
+}
+.cat-tb {
+  display: flex;
+}
+.cat-name {
+  margin: auto;
+}
+.cat-email {
+  margin: auto;
+}
+.cat-photo {
+  margin: auto 50px auto auto;
+}
+.cat-photo img {
+  width: 250px;
+  height: 250px;
+  border-radius: 20%;
+}
+.cat-photo img:hover {
+  opacity: 0.7;
+  cursor: pointer;
+  transition: 0.3s;
+}
+h3 {
+  font-family: 'Rubik Beastly', cursive;
+}
+h5 {
+  font-family: 'Poppins', sans-serif;
+}
+
+.catButton {
+  display: flex;
+  border-radius: 5px;
+  background-color: #a271d5;
+  padding: 4px 40px;
+  margin-bottom: 20px;
+  box-shadow: 1px 4px 6px;
+  text-decoration: none;
+}
+.catButton:hover {
+  opacity: 0.7;
+  cursor: pointer;
+  text-decoration: none;
+}
+.cat_admin_buttons {
+  margin: auto 10px auto auto;
+}
+.catEditBtn {
+  margin: auto;
+  text-decoration: none;
+  font-size: 24px;
+  font-family: 'Poppins', sans-serif;
+  color: black;
+}
+.catEditBtn:hover {
+  color: black;
+  text-decoration: none;
+}
+.catDeleteBtn {
+  margin: auto;
+  text-decoration: none;
+  font-size: 24px;
+  font-family: 'Poppins', sans-serif;
+  color: black;
+}
+.catDeleteBtn:hover {
+  color: black;
+  text-decoration: none;
+}
+.ui-widget-overlay{
+  display: none;
+}
+.ui-dialog-buttonpane{
+  display: flex;
+}
+.ui-dialog-buttonset{
+  margin: auto;
+  display: flex;
+}
+.form-control .ui-button .ui-corner-all .ui-widget{
+  margin: 20px 30px;
+  height: 30px;
+}
+
+.edit-cat {
+  display: flex;
+  flex-direction: column;
+}
+.form-submit {
+  margin: auto;
+}
+tr {
+  display: flex;
+}
+th {
+  margin: auto;
+}
+.cat-row:hover {
+  background-color: #d2c6df;
+}
+.cat-upper-row:hover {
+  background-color: #a271d5;
+}
+td {
+  font-size: 20px;
+  font-family: 'Poppins', sans-serif;
+  margin: auto;
+}
+.cats_list {
+  background-color: #d2c6df;
+}
+
+
+
+

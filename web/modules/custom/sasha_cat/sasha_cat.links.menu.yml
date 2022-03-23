@@ -1,0 +1,12 @@
+sasha_cat.settings_form:
+  title: sasha-cat
+  description: Configure sasha-cat.
+  parent: system.admin_config_system
+  route_name: sasha_cat.settings_form
+  weight: 10
+
+cats:
+  title: 'Cats list'
+  parent: system.admin_structure
+  route_name: admin_menu
+  weight: 50

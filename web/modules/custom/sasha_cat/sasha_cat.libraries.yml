@@ -1,0 +1,6 @@
+# Custom module library for general purposes.
+sasha_cat_library:
+  css:
+    theme:
+      css/style.css: {}
+

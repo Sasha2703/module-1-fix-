@@ -1,0 +1,24 @@
+<?php
+/**
+ * Implements hook_theme().
+ */
+function sasha_cat_theme ($existing, $type, $theme, $path) {
+  return [
+    'cats' => [
+      'render' => 'form',
+      'variables' => [
+        'form' => NULL,
+        'pager' => NULL,
+        'list' => [],
+      ],
+    ],
+    'admin-cats' => [
+      'render' => 'form',
+      'variables' => [
+        'form' => NULL,
+        'pager' => NULL,
+        'list' => [],
+      ],
+    ],
+  ];
+}
