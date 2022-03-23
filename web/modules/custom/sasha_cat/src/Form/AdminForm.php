@@ -87,8 +87,9 @@ class AdminForm extends FormBase {
     }
     return TRUE;
   }
-
-  //Function that validate Email field
+/**
+*  Function that validate Email field
+*/
   public function validateEmail(array &$form, FormStateInterface $form_state) {
     if (!preg_match("/^[a-zA-Z_\-]+@[a-zA-Z_\-\.]+\.[a-zA-Z\.]{2,6}+$/", $form_state->getValue('email'))) {
       $form_state->setErrorByName('email', $this->t('Your email is NOT invalid'));
