@@ -24,7 +24,7 @@ class SashaCatController extends ControllerBase {
   }
 
   /**
-   *
+   * Return  markup array.
    */
   public function catTable(): array{
     $query= \Drupal::database();
@@ -55,4 +55,5 @@ class SashaCatController extends ControllerBase {
     };
     return $data;
   }
+
 }

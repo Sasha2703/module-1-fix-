@@ -9,18 +9,21 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\file\Entity\File;
 
 /**
- *
+ * Implements an example form.
  */
 class EditCats extends FormBase{
 
   public $catID;
 
+  /**
+   * Implements content().
+   */
   public function getFormId(){
     return 'edit cat';
   }
 
   /**
-   *
+   * Implements content().
    */
   public function buildForm(array $form, FormStateInterface $form_state, $catID = NULL){
     $this->id = $catID;
@@ -80,7 +83,7 @@ class EditCats extends FormBase{
   }
 
   /**
-   *
+   * Function that validate Name field.
    */
   public function validateName(array &$form, FormStateInterface $form_state){
     if ((mb_strlen($form_state->getValue('adding_cat')) < 2)) {
@@ -92,7 +95,7 @@ class EditCats extends FormBase{
   }
 
   /**
-   *
+   * Function that validate Email field.
    */
   public function validateEmail(array &$form, FormStateInterface $form_state){
     if (!preg_match("/^[a-zA-Z_\-]+@[a-zA-Z_\-\.]+\.[a-zA-Z\.]{2,6}+$/", $form_state->getValue('email'))) {
@@ -103,7 +106,7 @@ class EditCats extends FormBase{
   }
 
   /**
-   *
+   * Function that validate Image field.
    */
   public function validateImage(array &$form, FormStateInterface $form_state){
     $picture = $form_state->getValue('cat_image');
@@ -115,7 +118,7 @@ class EditCats extends FormBase{
   }
 
   /**
-   *
+   * Validation of the whole form using validation of certain fields.
    */
   public function validateForm(array &$form, FormStateInterface $form_state){
     if (!$this->validateName($form, $form_state) && $this->validateEmail($form, $form_state) && $this->validateImage($form, $form_state)) {
@@ -125,7 +128,7 @@ class EditCats extends FormBase{
   }
 
   /**
-   *
+   * Function that submit form.
    */
   public function submitForm(array &$form, FormStateInterface $form_state){
     if ($this->validateForm($form, $form_state)) {
@@ -145,7 +148,7 @@ class EditCats extends FormBase{
   }
 
   /**
-   *
+   * Implements content().
    */
   public function AjaxSubmit(array &$form, FormStateInterface $form_state): AjaxResponse{
     $response = new AjaxResponse();
@@ -166,7 +169,7 @@ class EditCats extends FormBase{
   }
 
   /**
-   *
+   * Function that validate Email field with AJAX.
    */
   public function AjaxEmail(array &$form, FormStateInterface $form_state): AjaxResponse
   {
@@ -178,4 +181,5 @@ class EditCats extends FormBase{
     }
     return $response;
   }
+
 }

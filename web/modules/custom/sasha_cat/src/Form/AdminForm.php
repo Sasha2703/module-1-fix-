@@ -9,19 +9,19 @@ use Drupal\Core\Ajax\MessageCommand;
 use Drupal\file\Entity\File;
 
 /**
- *
+ * Implements an example form.
  */
 class AdminForm extends FormBase {
 
   /**
-   *
+   * Implements content().
    */
   public function getFormId() {
     return 'sasha_cat';
   }
 
   /**
-   *
+   * Implements content().
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form['item'] = [
@@ -77,9 +77,7 @@ class AdminForm extends FormBase {
     return $form;
   }
 
-  /**
-   *
-   */
+  //Function that validate Name field on its length
   public function validateName(array &$form, FormStateInterface $form_state) {
     if ((mb_strlen($form_state->getValue('adding_cat')) < 2)) {
       return FALSE;
@@ -90,9 +88,7 @@ class AdminForm extends FormBase {
     return TRUE;
   }
 
-  /**
-   *
-   */
+  //Function that validate Email field
   public function validateEmail(array &$form, FormStateInterface $form_state) {
     if (!preg_match("/^[a-zA-Z_\-]+@[a-zA-Z_\-\.]+\.[a-zA-Z\.]{2,6}+$/", $form_state->getValue('email'))) {
       $form_state->setErrorByName('email', $this->t('Your email is NOT invalid'));
@@ -101,9 +97,7 @@ class AdminForm extends FormBase {
     return TRUE;
   }
 
-  /**
-   *
-   */
+  //Function that validate Image field
   public function validateImage(array &$form, FormStateInterface $form_state) {
     $picture = $form_state->getValue('cat_image');
 
@@ -114,7 +108,7 @@ class AdminForm extends FormBase {
   }
 
   /**
-   *
+   * Validation of the whole form using validation of certain fields.
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
     if (!$this->validateName($form, $form_state) && $this->validateEmail($form, $form_state) && $this->validateImage($form, $form_state)) {
@@ -126,7 +120,7 @@ class AdminForm extends FormBase {
   }
 
   /**
-   *
+   * Implements content().
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     if ($this->validateForm($form, $form_state)) {
@@ -148,7 +142,7 @@ class AdminForm extends FormBase {
   }
 
   /**
-   *
+   * Implements content().
    */
   public function AjaxSubmit(array &$form, FormStateInterface $form_state) {
     $response = new AjaxResponse();
@@ -168,9 +162,7 @@ class AdminForm extends FormBase {
     return $response;
   }
 
-  /**
-   *
-   */
+  //Function that validate Email field with Ajax
   public function AjaxEmail(array &$form, FormStateInterface $form_state): AjaxResponse {
     $response = new AjaxResponse();
     if (preg_match("/^[a-zA-Z_\-]+@[a-zA-Z_\-\.]+\.[a-zA-Z\.]{2,6}+$/", $form_state->getValue('email'))) {
