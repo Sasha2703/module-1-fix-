@@ -9,8 +9,8 @@
          <div class="cat-photo"><a href="{{ file_url(cat.image['#uri']) }}" target="_blank">{{ cat.image }}</a></div>
          {% if user.hasPermission('administer nodes') %}
            <div class="cat_admin_buttons">
-             <div class="catButton adminCatEdit"><a href='/sasha-cat/cat/{{ cat.id }}/editCats/' class="use-ajax catEditBtn" data-dialog-type="modal">Edit</a></div>
-             <div class="catButton AdminCatDelete"><a href='/sasha-cat/cat/{{ cat.id }}/deleteCats/' class="use-ajax catDeleteBtn" data-dialog-type="modal">Delete</a></div>
+             <div class="catButton adminCatEdit"><a href='/sasha-cat/{{ cat.id }}/editCats/' class="use-ajax catEditBtn" data-dialog-type="modal">Edit</a></div>
+             <div class="catButton AdminCatDelete"><a href='/sasha-cat/{{ cat.id }}/deleteCats/' class="use-ajax catDeleteBtn" data-dialog-type="modal">Delete</a></div>
            </div>
          {% endif %}
        </div>

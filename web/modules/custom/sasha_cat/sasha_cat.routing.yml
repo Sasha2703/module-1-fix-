@@ -6,8 +6,8 @@ sasha.cats:
   requirements:
     _permission: 'access content'
 
-delete_button:
-  path: '/sasha-cat/cat/{catID}/deleteCats'
+delete.cats:
+  path: '/sasha-cat/{catID}/deleteCats'
   defaults:
     _form: '\Drupal\sasha_cat\Form\DeleteCats'
     _title: 'Do you want to delete this cat?'
@@ -15,8 +15,8 @@ delete_button:
     _permission: 'access content'
 
 
-edit_button:
-  path: '/sasha-cat/cat/{catID}/editCats'
+edit.cats:
+  path: '/sasha-cat/{catID}/editCats'
   defaults:
     _form: '\Drupal\sasha_cat\Form\EditCats'
     _title: 'Do you want to edit this cat?'
@@ -32,7 +32,7 @@ sasha_cat.settings_form:
   requirements:
     _permission: 'administer sasha_cat configuration'
 
-admin_menu:
+admin.cats:
   path: '/admin/structure/cats'
   defaults:
     _title: 'Cats list'
@@ -40,12 +40,3 @@ admin_menu:
     _form: 'Drupal\sasha_cat\Form\AdminForm'
   requirements:
     _permission: 'administer sasha_cat configuration'
-
-admin_delete:
-  path: '/sasha-cat/admin/delete-cat/{idCat}/deleteCats'
-  defaults:
-    _form: '\Drupal\sasha_cat\Form\AdminDelete'
-    _title: 'Do you want to delete this cat?'
-  requirements:
-    _role: 'administrator'
-    _permission: 'administrator'
