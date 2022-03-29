@@ -19,10 +19,10 @@ class CatAdminController extends ControllerBase
         $form = \Drupal::formBuilder()->getForm('Drupal\sasha_cat\Form\AdminForm');
         $element = 'Hello! You can add here a photo of your cat.';
         return [
-          '#theme' => 'admin-cats',
-          '#form' => $form,
-          '#markup' => $element,
-          '#list' => $this->catTable(),
+            '#theme' => 'admin-cats',
+            '#form' => $form,
+            '#markup' => $element,
+            '#list' => $this->catTable(),
         ];
     }
 

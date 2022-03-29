@@ -39,50 +39,50 @@ class EditCats extends FormBase
             ->fields('edt', ['name', 'email', 'image', 'id'])
             ->execute()->fetchAll();
         $form['adding_cat'] = [
-          '#type' => 'textfield',
-          '#title' => $this->t('Your cat’s name:'),
-          '#default_value' => $data[0]->name,
-          '#required' => true,
-          '#maxlength' => 32,
+            '#type' => 'textfield',
+            '#title' => $this->t('Your cat’s name:'),
+            '#default_value' => $data[0]->name,
+            '#required' => true,
+            '#maxlength' => 32,
         ];
 
         $form['email'] = [
-          '#type' => 'email',
-          '#title' => $this->t('Your email:'),
-          '#default_value' => $data[0]->email,
-          '#required' => true,
-          '#ajax' => [
-            'callback' => '::AjaxEmail',
-            'event' => 'change',
-            'progress' => [
-              'type' => 'none',
+            '#type' => 'email',
+            '#title' => $this->t('Your email:'),
+            '#default_value' => $data[0]->email,
+            '#required' => true,
+            '#ajax' => [
+                'callback' => '::AjaxEmail',
+                'event' => 'change',
+                'progress' => [
+                    'type' => 'none',
+                ],
             ],
-          ],
         ];
 
         $form['cat_image'] = [
-          '#type' => 'managed_file',
-          '#title' => $this->t('Your cat’s photo:'),
-          '#description' => t('Please use only these extensions: jpeg, jpg, png'),
-          '#upload_location' => 'public://images/',
-          '#default_value' => [$data[0]->image],
-          '#required' => true,
-          '#upload_validators' => [
-            'file_validate_extensions' => ['jpeg jpg png'],
-            'file_validate_size' => [2097152],
-          ],
+            '#type' => 'managed_file',
+            '#title' => $this->t('Your cat’s photo:'),
+            '#description' => t('Please use only these extensions: jpeg, jpg, png'),
+            '#upload_location' => 'public://images/',
+            '#default_value' => [$data[0]->image],
+            '#required' => true,
+            '#upload_validators' => [
+                'file_validate_extensions' => ['jpeg jpg png'],
+                'file_validate_size' => [2097152],
+            ],
         ];
 
         $form['submit'] = [
-          '#type' => 'submit',
-          '#value' => $this->t('Edit'),
-          '#button_type' => 'primary',
-          '#ajax' => [
-            'callback' => '::AjaxSubmit',
-            'progress' => [
-              'type' => 'none',
+            '#type' => 'submit',
+            '#value' => $this->t('Edit'),
+            '#button_type' => 'primary',
+            '#ajax' => [
+                'callback' => '::AjaxSubmit',
+                'progress' => [
+                    'type' => 'none',
+                ],
             ],
-          ],
         ];
         return $form;
     }
@@ -149,9 +149,9 @@ class EditCats extends FormBase
         return true;
     }
 
-      /**
-       * Function that submit form.
-       */
+    /**
+     * Function that submit form.
+     */
     public function submitForm(array &$form, FormStateInterface $form_state)
     {
         if ($this->validateForm($form, $form_state)) {

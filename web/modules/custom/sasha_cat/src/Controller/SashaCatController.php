@@ -1,6 +1,7 @@
 <?php
 
 namespace Drupal\sasha_cat\Controller;
+
 use Drupal\file\Entity\File;
 use Drupal\Core\Controller\ControllerBase;
 
@@ -18,9 +19,9 @@ class SashaCatController extends ControllerBase
     {
         $form['sasha_cat'] = \Drupal::formBuilder()->getForm('Drupal\sasha_cat\Form\CatForm');
         return [
-          '#theme' => 'cats',
-          '#form' =>$form,
-          '#list' => $this->catTable(),
+            '#theme' => 'cats',
+            '#form' => $form,
+            '#list' => $this->catTable(),
         ];
     }
 
@@ -29,7 +30,7 @@ class SashaCatController extends ControllerBase
      */
     public function catTable(): array
     {
-        $query= \Drupal::database();
+        $query = \Drupal::database();
         $result = $query->select('sasha_cat', 'sasha_cattb')
             ->fields('sasha_cattb', ['id', 'name', 'email', 'image', 'date'])
             ->orderBy('id', 'DESC')

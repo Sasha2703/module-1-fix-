@@ -12,7 +12,7 @@ use Drupal\Core\Url;
 class DeleteCats extends ConfirmFormBase
 {
 
-    public  $catID;
+    public $catID;
 
     /**
      * Implements content().

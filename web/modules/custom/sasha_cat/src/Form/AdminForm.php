@@ -23,6 +23,7 @@ class AdminForm extends FormBase
     {
         return 'sasha_cat';
     }
+
     /**
      * Implements content().
      */
@@ -57,8 +58,8 @@ class AdminForm extends FormBase
             '#type' => 'managed_file',
             '#title' => $this->t('Your cat’s photo:'),
             '#description' => t('Please use only these extensions: jpeg, jpg, png'),
-            '#upload_location'=> 'public://images/',
-            '#required'=> true,
+            '#upload_location' => 'public://images/',
+            '#required' => true,
             '#upload_validators' => [
                 'file_validate_extensions' => ['jpeg jpg png'],
                 'file_validate_size' => [2097152],
@@ -85,7 +86,7 @@ class AdminForm extends FormBase
     {
         if ((mb_strlen($form_state->getValue('adding_cat')) < 2)) {
             return false;
-        }  elseif ((mb_strlen($form_state->getValue('adding_cat')) > 32)) {
+        } elseif ((mb_strlen($form_state->getValue('adding_cat')) > 32)) {
             return false;
         }
         return true;
