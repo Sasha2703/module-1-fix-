@@ -1,8 +1,14 @@
 <?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the sasha-cat module.
+ */
+
 /**
  * Implements hook_theme().
  */
-function sasha_cat_theme ($existing, $type, $theme, $path) {
+function sasha_cat_theme($existing, $type, $theme, $path) {
   return [
     'cats' => [
       'render' => 'form',

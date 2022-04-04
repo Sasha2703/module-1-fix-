@@ -5,48 +5,46 @@
  * Install, update and uninstall functions for the sasha-cat module.
  */
 
-
 /**
- * @return mixed
  * Implements hook_schema().
  */
 function sasha_cat_schema(): array {
   $schema['sasha_cat'] = [
-      'fields' => [
-        'id' => [
-          'type' => 'serial',
-          'unsigned' => TRUE,
-          'not null' => TRUE,
-        ],
-        'name' => [
-          'type' => 'varchar',
-          'length' => 32,
-          'not null' => TRUE,
-          'default' => '',
-        ],
-        'email' => [
-          'type' => 'varchar',
-          'length' => 255,
-          'not null' => TRUE,
-          'default' => '',
-        ],
-        'image' => [
-          'type' => 'int',
-          'not null' => TRUE,
-          'default' => 0,
-          'length' => 64,
-        ],
-        'date' => [
-          'type' => 'varchar',
-          'length' => 255,
-          'not null' => TRUE,
-          'default' => '',
-        ],
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
       ],
-      'primary key' => [
-        'id',
+      'name' => [
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => '',
       ],
-    ];
+      'email' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'image' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'length' => 64,
+      ],
+      'date' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+    ],
+    'primary key' => [
+      'id',
+    ],
+  ];
 
-    return $schema;
-  }
+  return $schema;
+}
