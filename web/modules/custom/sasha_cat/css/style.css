@@ -1,34 +1,33 @@
-
-.navbar-header{
-    margin: 0 10px;
-   width: 1000px;
- }
-.page-header{
+.navbar-header {
+  margin: 0 10px;
+  width: 1000px;
+}
+.page-header {
   font-family: 'Poppins', sans-serif;
   color: black;
   font-size: 30px;
   font-weight: 300;
 }
-.button{
-  box-shadow: 0 3px 5px  black;
+.button {
+  box-shadow: 0 3px 5px black;
   background-color: #7a4ca9;
   border-color: #7a4ca9;
   text-decoration: none;
 }
 .button:hover {
-  box-shadow: 0 3px 5px  black;
+  box-shadow: 0 3px 5px black;
   background-color: #7a4ca9;
   border-color: #7a4ca9;
   text-decoration: none;
 }
 .button:active {
-  box-shadow: 0 3px 5px  black;
+  box-shadow: 0 3px 5px black;
   background-color: #7a4ca9;
   border-color: #7a4ca9;
   text-decoration: none;
 }
 .button:focus {
-  box-shadow: 0 3px 5px  black;
+  box-shadow: 0 3px 5px black;
   background-color: #7a4ca9;
   border-color: #7a4ca9;
   text-decoration: none;
@@ -111,17 +110,17 @@ h5 {
   color: black;
   text-decoration: none;
 }
-.ui-widget-overlay{
+.ui-widget-overlay {
   display: none;
 }
-.ui-dialog-buttonpane{
+.ui-dialog-buttonpane {
   display: flex;
 }
-.ui-dialog-buttonset{
+.ui-dialog-buttonset {
   margin: auto;
   display: flex;
 }
-.form-control .ui-button .ui-corner-all .ui-widget{
+.form-control .ui-button .ui-corner-all .ui-widget {
   margin: 20px 30px;
   height: 30px;
 }
@@ -153,7 +152,3 @@ td {
 .cats_list {
   background-color: #d2c6df;
 }
-
-
-
-
