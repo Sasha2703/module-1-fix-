@@ -16,14 +16,14 @@ use Drupal\Core\Url;
 class CatForm extends FormBase {
 
   /**
-   * Implements content().
+   * {@inheritdoc}
    */
   public function getFormId() {
     return 'sasha_cat';
   }
 
   /**
-   * Implements content().
+   * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form['item'] = [
@@ -37,6 +37,13 @@ class CatForm extends FormBase {
       '#placeholder' => $this->t('The name must be in range from 2 to 32 symbols'),
       '#required' => TRUE,
       '#maxlength' => 32,
+      '#ajax' => [
+        'callback' => '::ajaxValidName',
+        'event' => 'change',
+        'progress' => [
+          'type' => 'none',
+        ],
+      ],
     ];
     $form['email'] = [
       '#type' => 'email',
@@ -83,17 +90,28 @@ class CatForm extends FormBase {
     if ((mb_strlen($form_state->getValue('adding_cat')) < 2)) {
       return FALSE;
     }
-    elseif ((mb_strlen($form_state->getValue('adding_cat')) > 32)) {
-      return FALSE;
-    }
     return TRUE;
+  }
+
+  /**
+   * Set messages of errors or success using ajax for the name field.
+   */
+  public function ajaxValidName(array &$form, FormStateInterface $form_state): AjaxResponse {
+    $response = new AjaxResponse();
+    if ((mb_strlen($form_state->getValue('adding_cat')) < 2)) {
+      $response->addCommand(new MessageCommand('Your name is too short', ".null", ['type' => 'error']));
+    }
+    else {
+      $response->addCommand(new MessageCommand('Your name is valid'));
+    }
+    return $response;
   }
 
   /**
    * Function that validate Email field.
    */
   public function validateEmail(array &$form, FormStateInterface $form_state) {
-    if (!preg_match('/[-_@A-Za-z.]/', $form_state->getValue('email'))) {
+    if (preg_match('/[-_@A-Za-z.]/', $form_state->getValue('email'))) {
       return TRUE;
     }
     return FALSE;
@@ -129,16 +147,16 @@ class CatForm extends FormBase {
    * Validation of the whole form using validation of certain fields.
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
-    if (!$this->validateName($form, $form_state) && $this->validateEmail($form, $form_state) && $this->validateImage($form, $form_state)) {
-      return FALSE;
+    if ($this->validateName($form, $form_state) && $this->validateEmail($form, $form_state) && $this->validateImage($form, $form_state)) {
+      return TRUE;
     }
     else {
-      return TRUE;
+      return FALSE;
     }
   }
 
   /**
-   * Implements content().
+   * Function that submit form.
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     if ($this->validateForm($form, $form_state)) {
@@ -158,15 +176,12 @@ class CatForm extends FormBase {
   }
 
   /**
-   * Implements content().
+   * Function that validate Name and Image field with Ajax.
    */
   public function setMessage(array &$form, FormStateInterface $form_state) {
-    $response = new AjaxResponse();
     $nameValid = $this->validateName($form, $form_state);
     $imageValid = $this->validateImage($form, $form_state);
-    $url = Url::fromRoute('sasha.cats');
-
-    $response->addCommand(new RedirectCommand($url->toString()));
+    $response = new AjaxResponse();
     if (!$nameValid) {
       $response->addCommand(new MessageCommand('Your name is NOT valid', ".null", ['type' => 'error']));
     }
@@ -174,10 +189,10 @@ class CatForm extends FormBase {
       $response->addCommand(new MessageCommand('Please, upload your cat image', ".null", ['type' => 'error']));
     }
     else {
+      $url = Url::fromRoute('sasha.cats');
+      $response->addCommand(new RedirectCommand($url->toString()));
       $response->addCommand(new MessageCommand('Congratulations! You added your cat!'));
     }
-    \Drupal::messenger()->deleteAll();
-    $url = Url::fromRoute('sasha.cats');
     return $response;
   }
 

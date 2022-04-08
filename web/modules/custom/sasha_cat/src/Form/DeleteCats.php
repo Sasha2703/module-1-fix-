@@ -7,26 +7,26 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 
 /**
- * Table Form Class.
+ * Defines a confirmation form to confirm deletion of something by id.
  */
 class DeleteCats extends ConfirmFormBase {
 
   /**
-   * Implements content.
+   * ID of the item to delete.
    *
-   * @var catID
+   * @var int
    */
   public $catID;
 
   /**
-   * Implements content().
+   * {@inheritDoc}
    */
   public function getFormId() {
     return 'Delete Cat';
   }
 
   /**
-   * Implements content().
+   * {@inheritDoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state, $catID = NULL) {
     $this->id = $catID;
@@ -41,7 +41,7 @@ class DeleteCats extends ConfirmFormBase {
   }
 
   /**
-   * Implements content().
+   * Function that submit form.
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $query = \Drupal::database();

@@ -6,12 +6,12 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\file\Entity\File;
 
 /**
- * Implements content().
+ * An example controller.
  */
 class CatAdminController extends ControllerBase {
 
   /**
-   * Implements content().
+   * Display the markup.
    */
   public function content() {
     $form = \Drupal::formBuilder()->getForm('Drupal\sasha_cat\Form\AdminForm');
@@ -25,7 +25,10 @@ class CatAdminController extends ControllerBase {
   }
 
   /**
-   * Return  markup array.
+   * Get data from database.
+   *
+   * @return array
+   *   Return markup array.
    */
   public function catTable(): array {
     $query = \Drupal::database();

@@ -6,12 +6,12 @@ use Drupal\file\Entity\File;
 use Drupal\Core\Controller\ControllerBase;
 
 /**
- * Returns responses for sasha-cat routes.
+ * An example controller.
  */
 class SashaCatController extends ControllerBase {
 
   /**
-   * Builds the response.
+   * Display the markup.
    */
   public function content() {
     $form['sasha_cat'] = \Drupal::formBuilder()
@@ -24,7 +24,10 @@ class SashaCatController extends ControllerBase {
   }
 
   /**
-   * Return  markup array.
+   * Get data from database.
+   *
+   * @return array
+   *   Return markup array.
    */
   public function catTable(): array {
     $query = \Drupal::database();
