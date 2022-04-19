@@ -6,14 +6,16 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\file\Entity\File;
 
 /**
- * An example controller.
+ * An administration controller.
+ *
+ * @throw Drupal\Core\Controller\ControllerBase
  */
 class CatAdminController extends ControllerBase {
 
   /**
-   * Display the markup.
+   * Builds the response.
    */
-  public function content() {
+  public function content(): array {
     $form = \Drupal::formBuilder()->getForm('Drupal\sasha_cat\Form\AdminForm');
     $element = 'Hello! You can add here a photo of your cat.';
     return [

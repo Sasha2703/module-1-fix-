@@ -6,14 +6,16 @@ use Drupal\file\Entity\File;
 use Drupal\Core\Controller\ControllerBase;
 
 /**
- * An example controller.
+ * Provides route responses for the sasha_cat module.
+ *
+ * @throw Drupal\Core\Controller\ControllerBase
  */
 class SashaCatController extends ControllerBase {
 
   /**
-   * Display the markup.
+   * Builds the response.
    */
-  public function content() {
+  public function content(): array {
     $form['sasha_cat'] = \Drupal::formBuilder()
       ->getForm('Drupal\sasha_cat\Form\CatForm');
     return [

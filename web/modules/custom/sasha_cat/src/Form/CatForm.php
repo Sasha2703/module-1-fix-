@@ -16,16 +16,16 @@ use Drupal\Core\Url;
 class CatForm extends FormBase {
 
   /**
-   * {@inheritdoc}
+   * {@inheritDoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'sasha_cat';
   }
 
   /**
-   * {@inheritdoc}
+   * {@inheritDoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['item'] = [
       '#type' => 'page_title',
       '#title' => $this->t("You can add here a photo of your cat!"),
@@ -86,7 +86,7 @@ class CatForm extends FormBase {
   /**
    * Function that validate Name field on its length.
    */
-  public function validateName(array &$form, FormStateInterface $form_state) {
+  public function validateName(array &$form, FormStateInterface $form_state): bool {
     if ((mb_strlen($form_state->getValue('adding_cat')) < 2)) {
       return FALSE;
     }
@@ -97,12 +97,13 @@ class CatForm extends FormBase {
    * Set messages of errors or success using ajax for the name field.
    */
   public function ajaxValidName(array &$form, FormStateInterface $form_state): AjaxResponse {
+    $valid = $this->validateName($form, $form_state);
     $response = new AjaxResponse();
-    if ((mb_strlen($form_state->getValue('adding_cat')) < 2)) {
-      $response->addCommand(new MessageCommand('Your name is too short', ".null", ['type' => 'error']));
+    if ($valid) {
+      $response->addCommand(new MessageCommand('Your name is valid'));
     }
     else {
-      $response->addCommand(new MessageCommand('Your name is valid'));
+      $response->addCommand(new MessageCommand('Your name is too short', ".null", ['type' => 'error']));
     }
     return $response;
   }
@@ -110,8 +111,8 @@ class CatForm extends FormBase {
   /**
    * Function that validate Email field.
    */
-  public function validateEmail(array &$form, FormStateInterface $form_state) {
-    if (preg_match('/[-_@A-Za-z.]/', $form_state->getValue('email'))) {
+  public function validateEmail(array &$form, FormStateInterface $form_state): bool {
+    if (filter_var($form_state->getValue('email'), FILTER_VALIDATE_EMAIL)) {
       return TRUE;
     }
     return FALSE;
@@ -121,8 +122,9 @@ class CatForm extends FormBase {
    * Function that validate Email field with Ajax.
    */
   public function ajaxValidEmail(array &$form, FormStateInterface $form_state): AjaxResponse {
+    $valid = $this->validateEmail($form, $form_state);
     $response = new AjaxResponse();
-    if (preg_match('/[-_@A-Za-z.]/', $form_state->getValue('email'))) {
+    if ($valid) {
       $response->addCommand(new MessageCommand('Your email is valid'));
     }
     else {
@@ -134,7 +136,7 @@ class CatForm extends FormBase {
   /**
    * Function that validate Image field.
    */
-  public function validateImage(array &$form, FormStateInterface $form_state) {
+  public function validateImage(array &$form, FormStateInterface $form_state): bool {
     $picture = $form_state->getValue('cat_image');
 
     if (!empty($picture[0])) {
@@ -144,9 +146,9 @@ class CatForm extends FormBase {
   }
 
   /**
-   * Validation of the whole form using validation of certain fields.
+   * {@inheritDoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state): bool {
     if ($this->validateName($form, $form_state) && $this->validateEmail($form, $form_state) && $this->validateImage($form, $form_state)) {
       return TRUE;
     }
@@ -156,7 +158,9 @@ class CatForm extends FormBase {
   }
 
   /**
-   * Function that submit form.
+   * {@inheritdoc}
+   *
+   * @throws \Exception
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     if ($this->validateForm($form, $form_state)) {
@@ -178,7 +182,7 @@ class CatForm extends FormBase {
   /**
    * Function that validate Name and Image field with Ajax.
    */
-  public function setMessage(array &$form, FormStateInterface $form_state) {
+  public function setMessage(array &$form, FormStateInterface $form_state): AjaxResponse {
     $nameValid = $this->validateName($form, $form_state);
     $imageValid = $this->validateImage($form, $form_state);
     $response = new AjaxResponse();

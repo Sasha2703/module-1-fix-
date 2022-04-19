@@ -4,10 +4,13 @@ namespace Drupal\sasha_cat\Form;
 
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 
 /**
  * Defines a confirmation form to confirm deletion of something by id.
+ *
+ * @throw \Drupal\Core\Form\ConfirmFormBase
  */
 class DeleteCats extends ConfirmFormBase {
 
@@ -16,32 +19,32 @@ class DeleteCats extends ConfirmFormBase {
    *
    * @var int
    */
-  public $catID;
+  protected int $id;
 
   /**
    * {@inheritDoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'Delete Cat';
   }
 
   /**
    * {@inheritDoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $catID = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, $catID = NULL): array {
     $this->id = $catID;
     return parent::buildForm($form, $form_state);
   }
 
   /**
-   * Validation of the whole form using validation of certain fields.
+   * {@inheritDoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
     parent::validateForm($form, $form_state);
   }
 
   /**
-   * Function that submit form.
+   * {@inheritDoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $query = \Drupal::database();
@@ -53,37 +56,37 @@ class DeleteCats extends ConfirmFormBase {
   }
 
   /**
-   * Return Question.
+   * {@inheritDoc}
    */
-  public function getQuestion() {
+  public function getQuestion(): TranslatableMarkup {
     return $this->t('Do you want to delete this Cat?');
   }
 
   /**
-   * Return URL if cancel.
+   * {@inheritDoc}
    */
-  public function getCancelUrl() {
+  public function getCancelUrl(): Url {
     return new Url('sasha.cats');
   }
 
   /**
-   * Return Description.
+   * {@inheritDoc}
    */
-  public function getDescription() {
+  public function getDescription(): TranslatableMarkup {
     return $this->t('Do you want to delete ?');
   }
 
   /**
-   * Return confirm text.
+   * {@inheritDoc}
    */
-  public function getConfirmText() {
+  public function getConfirmText(): TranslatableMarkup {
     return $this->t('Delete');
   }
 
   /**
-   * Return cancel text.
+   * {@inheritDoc}
    */
-  public function getCancelText() {
+  public function getCancelText(): TranslatableMarkup {
     return t('Cancel');
   }
 

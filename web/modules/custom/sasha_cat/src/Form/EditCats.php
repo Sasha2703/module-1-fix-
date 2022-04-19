@@ -12,32 +12,34 @@ use Drupal\file\Entity\File;
 
 /**
  * Form for editing cats.
+ *
+ * @throw \Drupal\Core\Form\FormBase
  */
 class EditCats extends FormBase {
 
   /**
    * Cat to edit if any.
    *
-   * @var object
+   * @var int
    */
-  public $catID;
+  protected int $id;
 
   /**
    * {@inheritDoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'edit cat';
   }
 
   /**
    * {@inheritDoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $catID = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, $catID = NULL): array {
     $this->id = $catID;
     $query = \Drupal::database();
     $data = $query
       ->select('sasha_cat', 'edt')
-      ->condition('edt.id', $catID, '=')
+      ->condition('edt.id', $catID)
       ->fields('edt', ['name', 'email', 'image', 'id'])
       ->execute()->fetchAll();
     $form['adding_cat'] = [
@@ -99,7 +101,7 @@ class EditCats extends FormBase {
   /**
    * Function that validate Name field.
    */
-  public function validateName(array &$form, FormStateInterface $form_state) {
+  public function validateName(array &$form, FormStateInterface $form_state): bool {
     if ((mb_strlen($form_state->getValue('adding_cat')) < 2)) {
       return FALSE;
     }
@@ -110,12 +112,13 @@ class EditCats extends FormBase {
    * Set messages of errors or success using ajax for the name field.
    */
   public function ajaxValidName(array &$form, FormStateInterface $form_state): AjaxResponse {
+    $valid = $this->validateName($form, $form_state);
     $response = new AjaxResponse();
-    if ((mb_strlen($form_state->getValue('adding_cat')) < 2)) {
-      $response->addCommand(new MessageCommand('Your name is too short', ".null", ['type' => 'error']));
+    if ($valid) {
+      $response->addCommand(new MessageCommand('Your name is valid'));
     }
     else {
-      $response->addCommand(new MessageCommand('Your name is valid'));
+      $response->addCommand(new MessageCommand('Your name is too short', ".null", ['type' => 'error']));
     }
     return $response;
   }
@@ -123,8 +126,8 @@ class EditCats extends FormBase {
   /**
    * Function that validate Email field.
    */
-  public function validateEmail(array &$form, FormStateInterface $form_state) {
-    if (preg_match('/[-_@A-Za-z.]/', $form_state->getValue('email'))) {
+  public function validateEmail(array &$form, FormStateInterface $form_state): bool {
+    if (filter_var($form_state->getValue('email'), FILTER_VALIDATE_EMAIL)) {
       return TRUE;
     }
     return FALSE;
@@ -134,12 +137,13 @@ class EditCats extends FormBase {
    * Function that validate Email field with AJAX.
    */
   public function ajaxValidEmail(array &$form, FormStateInterface $form_state): AjaxResponse {
+    $valid = $this->validateEmail($form, $form_state);
     $response = new AjaxResponse();
-    if (preg_match('/[-_@A-Za-z.]/', $form_state->getValue('email'))) {
+    if ($valid) {
       $response->addCommand(new MessageCommand('Your email is valid'));
     }
     else {
-      $response->addCommand(new MessageCommand('Your email is NOT valid', ".null", [], TRUE));
+      $response->addCommand(new MessageCommand('Your email is NOT valid', ".null", ['type' => 'error']));
     }
     return $response;
   }
@@ -147,7 +151,7 @@ class EditCats extends FormBase {
   /**
    * Function that validate Image field.
    */
-  public function validateImage(array &$form, FormStateInterface $form_state) {
+  public function validateImage(array &$form, FormStateInterface $form_state): bool {
     $picture = $form_state->getValue('cat_image');
     if (!empty($picture[0])) {
       return TRUE;
@@ -156,9 +160,9 @@ class EditCats extends FormBase {
   }
 
   /**
-   * Validation of the whole form using validation of certain fields.
+   * {@inheritDoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state): bool {
     if ($this->validateName($form, $form_state) && $this->validateEmail($form, $form_state) && $this->validateImage($form, $form_state)) {
       return TRUE;
     }
@@ -168,7 +172,9 @@ class EditCats extends FormBase {
   }
 
   /**
-   * Function that submit form.
+   * {@inheritDoc}
+   *
+   * @throws \Exception
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     if ($this->validateForm($form, $form_state)) {
@@ -194,7 +200,7 @@ class EditCats extends FormBase {
   /**
    * Function that validate Name and Image field with Ajax.
    */
-  public function setMessage(array &$form, FormStateInterface $form_state) {
+  public function setMessage(array &$form, FormStateInterface $form_state): AjaxResponse {
     $nameValid = $this->validateName($form, $form_state);
     $imageValid = $this->validateImage($form, $form_state);
     $response = new AjaxResponse();
