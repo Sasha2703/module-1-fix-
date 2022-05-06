@@ -18,14 +18,14 @@ class CatForm extends FormBase {
   /**
    * {@inheritDoc}
    */
-  public function getFormId(): string {
+  public function getFormId() {
     return 'sasha_cat';
   }
 
   /**
    * {@inheritDoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state): array {
+  public function buildForm(array $form, FormStateInterface $form_state) {
     $form['item'] = [
       '#type' => 'page_title',
       '#title' => $this->t("You can add here a photo of your cat!"),
@@ -148,7 +148,7 @@ class CatForm extends FormBase {
   /**
    * {@inheritDoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state): bool {
+  public function validateForm(array &$form, FormStateInterface $form_state) {
     if ($this->validateName($form, $form_state) && $this->validateEmail($form, $form_state) && $this->validateImage($form, $form_state)) {
       return TRUE;
     }

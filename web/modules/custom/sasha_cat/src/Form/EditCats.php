@@ -27,19 +27,19 @@ class EditCats extends FormBase {
   /**
    * {@inheritDoc}
    */
-  public function getFormId(): string {
-    return 'edit cat';
+  public function getFormId() {
+    return 'edit_cat';
   }
 
   /**
    * {@inheritDoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $catID = NULL): array {
-    $this->id = $catID;
+  public function buildForm(array $form, FormStateInterface $form_state, $id = NULL) {
+    $this->id = $id;
     $query = \Drupal::database();
     $data = $query
       ->select('sasha_cat', 'edt')
-      ->condition('edt.id', $catID)
+      ->condition('edt.id', $id)
       ->fields('edt', ['name', 'email', 'image', 'id'])
       ->execute()->fetchAll();
     $form['adding_cat'] = [
@@ -162,7 +162,7 @@ class EditCats extends FormBase {
   /**
    * {@inheritDoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state): bool {
+  public function validateForm(array &$form, FormStateInterface $form_state) {
     if ($this->validateName($form, $form_state) && $this->validateEmail($form, $form_state) && $this->validateImage($form, $form_state)) {
       return TRUE;
     }
