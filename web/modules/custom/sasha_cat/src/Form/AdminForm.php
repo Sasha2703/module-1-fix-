@@ -2,11 +2,8 @@
 
 namespace Drupal\sasha_cat\Form;
 
-use Drupal\Core\Ajax\RedirectCommand;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Ajax\AjaxResponse;
-use Drupal\Core\Ajax\MessageCommand;
 use Drupal\Core\Url;
 use Drupal\file\Entity\File;
 
@@ -44,7 +41,7 @@ class AdminForm extends FormBase {
     $query->fields('sasha_cattb', ['id', 'name', 'email', 'image', 'date'])
       ->orderBy('id', 'DESC');
     $info = $query->execute()->fetchAll();
-    $info = json_decode(json_encode($info),TRUE);
+    $info = json_decode(json_encode($info), TRUE);
     $headers = [
       t('Cat'),
       t('Image'),
@@ -112,4 +109,5 @@ class AdminForm extends FormBase {
       $result->execute();
     }
   }
+
 }

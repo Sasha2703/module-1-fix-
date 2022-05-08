@@ -200,8 +200,9 @@ class CatForm extends FormBase {
    */
   public function setMessage(array &$form, FormStateInterface $form_state): AjaxResponse {
     $response = new AjaxResponse();
-      $url = Url::fromRoute('sasha_cat.content');
-      $response->addCommand(new RedirectCommand($url->toString()));
+    $url = Url::fromRoute('sasha_cat.content');
+    $response->addCommand(new RedirectCommand($url->toString()));
+    $response->addCommand(new MessageCommand('Congratulations! You added your cat!'));
     return $response;
   }
 

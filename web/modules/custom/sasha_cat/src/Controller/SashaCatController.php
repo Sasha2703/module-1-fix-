@@ -2,7 +2,6 @@
 
 namespace Drupal\sasha_cat\Controller;
 
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\file\Entity\File;
 use Drupal\Core\Controller\ControllerBase;
 
@@ -29,16 +28,6 @@ class SashaCatController extends ControllerBase {
     return [
       '#theme' => 'cats',
       '#form' => $form,
-      '#list' => $this->catTable(),
-    ];
-  }
-  public function build() {
-    $form = \Drupal::formBuilder()->getForm('Drupal\sasha_cat\Form\AdminForm');
-    $element = 'Hello! You can add here a photo of your cat.';
-    return [
-      '#theme' => 'admin-cats',
-      '#form' => $form,
-      '#markup' => $element,
       '#list' => $this->catTable(),
     ];
   }
