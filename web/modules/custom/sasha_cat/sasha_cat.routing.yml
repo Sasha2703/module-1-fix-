@@ -36,7 +36,6 @@ sasha_cat.admin:
   path: '/admin/structure/cats'
   defaults:
     _title: 'Cats list'
-    _controller: '\Drupal\sasha_cat\Controller\SashaCatController::content'
     _form: 'Drupal\sasha_cat\Form\AdminForm'
   requirements:
     _permission: 'administer sasha_cat configuration'

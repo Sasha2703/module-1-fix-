@@ -22,6 +22,13 @@ use Drupal\file\Entity\File;
 class AdminForm extends FormBase {
 
   /**
+   * ID of the item to delete.
+   *
+   * @var int
+   */
+  protected int $id;
+
+  /**
    * {@inheritdoc}
    */
   public function getFormId() {
@@ -32,178 +39,77 @@ class AdminForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $form['item'] = [
-      '#type' => 'page_title',
-      '#title' => $this->t("You can add here a photo of your cat!"),
+    $connection = \Drupal::service('database');
+    $query = $connection->select('sasha_cat', 'sasha_cattb');
+    $query->fields('sasha_cattb', ['id', 'name', 'email', 'image', 'date'])
+      ->orderBy('id', 'DESC');
+    $info = $query->execute()->fetchAll();
+    $info = json_decode(json_encode($info),TRUE);
+    $headers = [
+      t('Cat'),
+      t('Image'),
+      t('Mail'),
+      t('Time'),
+      t('Edit'),
     ];
-
-    $form['adding_cat'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t('Your cat’s name:'),
-      '#placeholder' => $this->t('The name must be in range from 2 to 32 symbols'),
-      '#required' => TRUE,
-      '#maxlength' => 32,
-      '#ajax' => [
-        'callback' => '::ajaxValidName',
-        'event' => 'change',
-        'progress' => [
-          'type' => 'none',
-        ],
-      ],
+    $rows = [];
+    foreach ($info as &$value) {
+      $fid = $value['image'];
+      $id = $value['id'];
+      $name = $value['name'];
+      $email = $value['email'];
+      $date = $value['date'];
+      array_splice($value, 0, 5);
+      $renderer = \Drupal::service('renderer');
+      $file = File::load($fid);
+      $img = [
+        '#type' => 'image',
+        '#theme' => 'image_style',
+        '#style_name' => 'thumbnail',
+        '#uri' => $file->getFileUri(),
+      ];
+      $edit = [
+        '#type' => 'link',
+        '#url' => Url::fromUserInput("/sasha-cat/cat/$id/edit"),
+        '#title' => $this->t('Edit'),
+        '#attributes' => ['class' => ['button']],
+      ];
+      $newId = [
+        '#type' => 'hidden',
+        '#value' => $id,
+      ];
+      $value[0] = $name;
+      $value[1] = $renderer->render($img);
+      $value[2] = $email;
+      $value[3] = $date;
+      $value[4] = $renderer->render($edit);
+      $value[5] = $newId;
+      array_push($rows, $value);
+    }
+    $form['table'] = [
+      '#type' => 'tableselect',
+      '#header' => $headers,
+      '#options' => $rows,
+      '#empty' => t('No entries available.'),
     ];
-    $form['email'] = [
-      '#type' => 'email',
-      '#title' => $this->t('Your email:'),
-      '#placeholder' => $this->t('example@email.com'),
-      '#required' => TRUE,
-      '#ajax' => [
-        'callback' => '::ajaxValidEmail',
-        'event' => 'change',
-        'progress' => [
-          'type' => 'none',
-        ],
-      ],
-    ];
-    $form['cat_image'] = [
-      '#type' => 'managed_file',
-      '#title' => $this->t('Your cat’s photo:'),
-      '#description' => t('Please use only these extensions: jpeg, jpg, png'),
-      '#upload_location' => 'public://images/',
-      '#required' => TRUE,
-      '#upload_validators' => [
-        'file_validate_extensions' => ['jpeg jpg png'],
-        'file_validate_size' => [2097152],
-      ],
-    ];
-    $form['submit'] = [
+    $form['actions']['submit'] = [
       '#type' => 'submit',
-      '#value' => $this->t('Add cat'),
-      '#button_type' => 'primary',
-      '#ajax' => [
-        'callback' => '::setMessage',
-        'progress' => [
-          'type' => 'none',
-        ],
-      ],
+      '#value' => $this->t('Delete selected'),
+      '#description' => $this->t('Submit, #type = submit'),
     ];
     return $form;
   }
 
   /**
-   * Function that validate Name field on its length.
-   */
-  public function validateName(array &$form, FormStateInterface $form_state): bool {
-    if ((mb_strlen($form_state->getValue('adding_cat')) < 2)) {
-      return FALSE;
-    }
-    return TRUE;
-  }
-
-  /**
-   * Set messages of errors or success using ajax for the name field.
-   */
-  public function ajaxValidName(array &$form, FormStateInterface $form_state): AjaxResponse {
-    $valid = $this->validateName($form, $form_state);
-    $response = new AjaxResponse();
-    if ($valid) {
-      $response->addCommand(new MessageCommand('Your name is valid'));
-    }
-    else {
-      $response->addCommand(new MessageCommand('Your name is too short', ".null", ['type' => 'error']));
-    }
-    return $response;
-  }
-
-  /**
-   * Function that validate Email field.
-   */
-  public function validateEmail(array &$form, FormStateInterface $form_state): bool {
-    if (filter_var($form_state->getValue('email'), FILTER_VALIDATE_EMAIL)) {
-      return TRUE;
-    }
-    return FALSE;
-  }
-
-  /**
-   * Function that validate Email field with Ajax.
-   */
-  public function ajaxValidEmail(array &$form, FormStateInterface $form_state): AjaxResponse {
-    $valid = $this->validateEmail($form, $form_state);
-    $response = new AjaxResponse();
-    if ($valid) {
-      $response->addCommand(new MessageCommand('Your email is valid'));
-    }
-    else {
-      $response->addCommand(new MessageCommand('Your email is NOT valid', ".null", ['type' => 'error']));
-    }
-    return $response;
-  }
-
-  /**
-   * Function that validate Image field.
-   */
-  public function validateImage(array &$form, FormStateInterface $form_state): bool {
-    $picture = $form_state->getValue('cat_image');
-
-    if (!empty($picture[0])) {
-      return TRUE;
-    }
-    return FALSE;
-  }
-
-  /**
    * {@inheritdoc}
-   */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
-    if ($this->validateName($form, $form_state) && $this->validateEmail($form, $form_state) && $this->validateImage($form, $form_state)) {
-      return TRUE;
-    }
-    else {
-      return FALSE;
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   *
-   * @throws \Exception
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    if ($this->validateForm($form, $form_state)) {
-      $picture = $form_state->getValue('cat_image');
-      $file = File::load($picture[0]);
-      $file->setPermanent();
-      $file->save();
-
-      $cat = [
-        'name' => $form_state->getValue('adding_cat'),
-        'email' => $form_state->getValue('email'),
-        'image' => $picture[0],
-        'date' => date('d-m-Y H:i:s'),
-      ];
-      \Drupal::database()->insert('sasha_cat')->fields($cat)->execute();
+    $value = $form['table']['#value'];
+    $connection = \Drupal::service('database');
+    foreach ($value as $key => $val) {
+      $result = $connection->delete('sasha_cat');
+      $result->condition('id', $form['table']['#options'][$key][5]["#value"]);
+      $result->execute();
     }
   }
-
-  /**
-   * Function that validate Name and Image field with Ajax.
-   */
-  public function setMessage(array &$form, FormStateInterface $form_state): AjaxResponse {
-    $nameValid = $this->validateName($form, $form_state);
-    $imageValid = $this->validateImage($form, $form_state);
-    $response = new AjaxResponse();
-    if (!$nameValid) {
-      $response->addCommand(new MessageCommand('Your name is NOT valid', ".null", ['type' => 'error']));
-    }
-    elseif (!$imageValid) {
-      $response->addCommand(new MessageCommand('Please, upload your cat image', ".null", ['type' => 'error']));
-    }
-    else {
-      $url = Url::fromRoute('sasha_cat.admin');
-      $response->addCommand(new RedirectCommand($url->toString()));
-      $response->addCommand(new MessageCommand('Congratulations! You added your cat!'));
-    }
-    return $response;
-  }
-
 }

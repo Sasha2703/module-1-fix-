@@ -23,12 +23,22 @@ class SashaCatController extends ControllerBase {
   /**
    * Builds the response.
    */
-  public function content(): array {
+  public function content() {
     $form['sasha_cat'] = \Drupal::formBuilder()
       ->getForm('Drupal\sasha_cat\Form\CatForm');
     return [
       '#theme' => 'cats',
       '#form' => $form,
+      '#list' => $this->catTable(),
+    ];
+  }
+  public function build() {
+    $form = \Drupal::formBuilder()->getForm('Drupal\sasha_cat\Form\AdminForm');
+    $element = 'Hello! You can add here a photo of your cat.';
+    return [
+      '#theme' => 'admin-cats',
+      '#form' => $form,
+      '#markup' => $element,
       '#list' => $this->catTable(),
     ];
   }
@@ -39,7 +49,7 @@ class SashaCatController extends ControllerBase {
    * @return array
    *   Return markup array.
    */
-  public function catTable(): array {
+  public function catTable() {
     $query = \Drupal::database();
     $result = $query->select('sasha_cat', 'sasha_cattb')
       ->fields('sasha_cattb', ['id', 'name', 'email', 'image', 'date'])

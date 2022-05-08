@@ -9,7 +9,6 @@ use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\MessageCommand;
 use Drupal\file\Entity\File;
 use Drupal\Core\Url;
-use Drupal\sasha_cat\Controller\SashaCatController;
 
 /**
  * Implements an example form.
@@ -24,13 +23,6 @@ class CatForm extends FormBase {
   protected $id;
 
   /**
-   * Cat data object.
-   *
-   * @var object
-   */
-  protected $cat;
-
-  /**
    * {@inheritDoc}
    */
   public function getFormId() {
@@ -43,7 +35,6 @@ class CatForm extends FormBase {
   public function buildForm(array $form, FormStateInterface $form_state, string $id = NULL) {
     $this->id = $id;
     if (!is_null($id)) {
-      $this->cat = (new \Drupal\sasha_cat\Controller\SashaCatController)->catTable($this->id)[0];
       $query = \Drupal::database();
       $data = $query
         ->select('sasha_cat', 'edt')
@@ -174,24 +165,12 @@ class CatForm extends FormBase {
   }
 
   /**
-   * {@inheritDoc}
-   */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
-    if ($this->validateName($form, $form_state) && $this->validateEmail($form, $form_state) && $this->validateImage($form, $form_state)) {
-      return TRUE;
-    }
-    else {
-      return FALSE;
-    }
-  }
-
-  /**
    * {@inheritdoc}
    *
    * @throws \Exception
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    if ($this->validateForm($form, $form_state)) {
+    if ($this->validateName($form, $form_state) && $this->validateEmail($form, $form_state) && $this->validateImage($form, $form_state)) {
       $picture = $form_state->getValue('cat_image');
       $file = File::load($picture[0]);
       $file->setPermanent();
@@ -220,20 +199,9 @@ class CatForm extends FormBase {
    * Function that validate Name and Image field with Ajax.
    */
   public function setMessage(array &$form, FormStateInterface $form_state): AjaxResponse {
-    $nameValid = $this->validateName($form, $form_state);
-    $imageValid = $this->validateImage($form, $form_state);
     $response = new AjaxResponse();
-    if (!$nameValid) {
-      $response->addCommand(new MessageCommand('Your name is NOT valid', ".null", ['type' => 'error']));
-    }
-    elseif (!$imageValid) {
-      $response->addCommand(new MessageCommand('Please, upload your cat image', ".null", ['type' => 'error']));
-    }
-    else {
       $url = Url::fromRoute('sasha_cat.content');
       $response->addCommand(new RedirectCommand($url->toString()));
-      $response->addCommand(new MessageCommand('Congratulations! You added your cat!'));
-    }
     return $response;
   }
 
