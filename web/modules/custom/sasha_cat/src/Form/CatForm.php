@@ -9,6 +9,7 @@ use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\MessageCommand;
 use Drupal\file\Entity\File;
 use Drupal\Core\Url;
+use Drupal\sasha_cat\Controller\SashaCatController;
 
 /**
  * Implements an example form.
@@ -16,16 +17,40 @@ use Drupal\Core\Url;
 class CatForm extends FormBase {
 
   /**
+   * ID of the item to edit.
+   *
+   * @var int
+   */
+  protected $id;
+
+  /**
+   * Cat data object.
+   *
+   * @var object
+   */
+  protected $cat;
+
+  /**
    * {@inheritDoc}
    */
-  public function getFormId(): string {
+  public function getFormId() {
     return 'sasha_cat';
   }
 
   /**
    * {@inheritDoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state): array {
+  public function buildForm(array $form, FormStateInterface $form_state, string $id = NULL) {
+    $this->id = $id;
+    if (!is_null($id)) {
+      $this->cat = (new \Drupal\sasha_cat\Controller\SashaCatController)->catTable($this->id)[0];
+      $query = \Drupal::database();
+      $data = $query
+        ->select('sasha_cat', 'edt')
+        ->condition('edt.id', $id)
+        ->fields('edt', ['name', 'email', 'image', 'id'])
+        ->execute()->fetchAll();
+    }
     $form['item'] = [
       '#type' => 'page_title',
       '#title' => $this->t("You can add here a photo of your cat!"),
@@ -37,6 +62,7 @@ class CatForm extends FormBase {
       '#placeholder' => $this->t('The name must be in range from 2 to 32 symbols'),
       '#required' => TRUE,
       '#maxlength' => 32,
+      '#default_value' => $data[0]->name,
       '#ajax' => [
         'callback' => '::ajaxValidName',
         'event' => 'change',
@@ -50,6 +76,7 @@ class CatForm extends FormBase {
       '#title' => $this->t('Your email:'),
       '#placeholder' => $this->t('example@email.com'),
       '#required' => TRUE,
+      '#default_value' => $data[0]->email,
       '#ajax' => [
         'callback' => '::ajaxValidEmail',
         'event' => 'change',
@@ -63,6 +90,7 @@ class CatForm extends FormBase {
       '#title' => $this->t('Your cat’s photo:'),
       '#description' => t('Please use only these extensions: jpeg, jpg, png'),
       '#upload_location' => 'public://images/',
+      '#default_value' => [$data[0]->image],
       '#required' => TRUE,
       '#upload_validators' => [
         'file_validate_extensions' => ['jpeg jpg png'],
@@ -71,7 +99,7 @@ class CatForm extends FormBase {
     ];
     $form['submit'] = [
       '#type' => 'submit',
-      '#value' => $this->t('Add cat'),
+      '#value' => $this->t('Save'),
       '#button_type' => 'primary',
       '#ajax' => [
         'callback' => '::setMessage',
@@ -148,7 +176,7 @@ class CatForm extends FormBase {
   /**
    * {@inheritDoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state): bool {
+  public function validateForm(array &$form, FormStateInterface $form_state) {
     if ($this->validateName($form, $form_state) && $this->validateEmail($form, $form_state) && $this->validateImage($form, $form_state)) {
       return TRUE;
     }
@@ -175,7 +203,16 @@ class CatForm extends FormBase {
         'image' => $picture[0],
         'date' => date('d-m-Y H:i:s'),
       ];
-      \Drupal::database()->insert('sasha_cat')->fields($cat)->execute();
+      if (!is_null($this->id)) {
+        \Drupal::database()
+          ->update('sasha_cat')
+          ->condition('id', $this->id)
+          ->fields($cat)
+          ->execute();
+      }
+      else {
+        \Drupal::database()->insert('sasha_cat')->fields($cat)->execute();
+      }
     }
   }
 
@@ -193,7 +230,7 @@ class CatForm extends FormBase {
       $response->addCommand(new MessageCommand('Please, upload your cat image', ".null", ['type' => 'error']));
     }
     else {
-      $url = Url::fromRoute('sasha.cats');
+      $url = Url::fromRoute('sasha_cat.content');
       $response->addCommand(new RedirectCommand($url->toString()));
       $response->addCommand(new MessageCommand('Congratulations! You added your cat!'));
     }

@@ -8,5 +8,5 @@ sasha_cat.settings_form:
 cats:
   title: 'Cats list'
   parent: system.admin_structure
-  route_name: admin.cats
+  route_name: sasha_cat.admin
   weight: 50

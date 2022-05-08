@@ -71,7 +71,7 @@ h5 {
   font-family: 'Poppins', sans-serif;
 }
 
-.catButton {
+.cat-button {
   display: flex;
   border-radius: 5px;
   background-color: #a271d5;
@@ -80,33 +80,33 @@ h5 {
   box-shadow: 1px 4px 6px;
   text-decoration: none;
 }
-.catButton:hover {
+.cat-button:hover {
   opacity: 0.7;
   cursor: pointer;
   text-decoration: none;
 }
-.cat_admin_buttons {
+.cat-admin-buttons {
   margin: auto 10px auto auto;
 }
-.catEditBtn {
+.cat-edit-btn {
   margin: auto;
   text-decoration: none;
   font-size: 24px;
   font-family: 'Poppins', sans-serif;
   color: black;
 }
-.catEditBtn:hover {
+.cat-edit-btn:hover {
   color: black;
   text-decoration: none;
 }
-.catDeleteBtn {
+.cat-delete-btn {
   margin: auto;
   text-decoration: none;
   font-size: 24px;
   font-family: 'Poppins', sans-serif;
   color: black;
 }
-.catDeleteBtn:hover {
+.cat-delete-btn:hover {
   color: black;
   text-decoration: none;
 }
@@ -149,6 +149,6 @@ td {
   font-family: 'Poppins', sans-serif;
   margin: auto;
 }
-.cats_list {
+.cats-list {
   background-color: #d2c6df;
 }

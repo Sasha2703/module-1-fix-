@@ -24,14 +24,14 @@ class AdminForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId(): string {
+  public function getFormId() {
     return 'sasha_cat';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state): array {
+  public function buildForm(array $form, FormStateInterface $form_state) {
     $form['item'] = [
       '#type' => 'page_title',
       '#title' => $this->t("You can add here a photo of your cat!"),
@@ -154,7 +154,7 @@ class AdminForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state): bool {
+  public function validateForm(array &$form, FormStateInterface $form_state) {
     if ($this->validateName($form, $form_state) && $this->validateEmail($form, $form_state) && $this->validateImage($form, $form_state)) {
       return TRUE;
     }
@@ -199,7 +199,7 @@ class AdminForm extends FormBase {
       $response->addCommand(new MessageCommand('Please, upload your cat image', ".null", ['type' => 'error']));
     }
     else {
-      $url = Url::fromRoute('admin.cats');
+      $url = Url::fromRoute('sasha_cat.admin');
       $response->addCommand(new RedirectCommand($url->toString()));
       $response->addCommand(new MessageCommand('Congratulations! You added your cat!'));
     }

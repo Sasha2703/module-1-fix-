@@ -2,6 +2,7 @@
 
 namespace Drupal\sasha_cat\Controller;
 
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\file\Entity\File;
 use Drupal\Core\Controller\ControllerBase;
 
@@ -11,6 +12,13 @@ use Drupal\Core\Controller\ControllerBase;
  * @throw Drupal\Core\Controller\ControllerBase
  */
 class SashaCatController extends ControllerBase {
+
+  /**
+   * Cat to edit if any.
+   *
+   * @var int
+   */
+  protected int $id;
 
   /**
    * Builds the response.

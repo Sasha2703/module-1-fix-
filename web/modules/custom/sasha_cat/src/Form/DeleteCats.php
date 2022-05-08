@@ -24,15 +24,15 @@ class DeleteCats extends ConfirmFormBase {
   /**
    * {@inheritDoc}
    */
-  public function getFormId(): string {
-    return 'Delete Cat';
+  public function getFormId() {
+    return 'delete_cat';
   }
 
   /**
    * {@inheritDoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $catID = NULL): array {
-    $this->id = $catID;
+  public function buildForm(array $form, FormStateInterface $form_state, $id = NULL) {
+    $this->id = $id;
     return parent::buildForm($form, $form_state);
   }
 
@@ -52,41 +52,41 @@ class DeleteCats extends ConfirmFormBase {
       ->condition('id', $this->id)
       ->execute();
     \Drupal::messenger()->addStatus('You deleted your cat');
-    $form_state->setRedirect('sasha.cats');
+    $form_state->setRedirect('sasha_cat.content');
   }
 
   /**
    * {@inheritDoc}
    */
-  public function getQuestion(): TranslatableMarkup {
+  public function getQuestion() {
     return $this->t('Do you want to delete this Cat?');
   }
 
   /**
    * {@inheritDoc}
    */
-  public function getCancelUrl(): Url {
-    return new Url('sasha.cats');
+  public function getCancelUrl() {
+    return new Url('sasha_cat.content');
   }
 
   /**
    * {@inheritDoc}
    */
-  public function getDescription(): TranslatableMarkup {
+  public function getDescription() {
     return $this->t('Do you want to delete ?');
   }
 
   /**
    * {@inheritDoc}
    */
-  public function getConfirmText(): TranslatableMarkup {
+  public function getConfirmText() {
     return $this->t('Delete');
   }
 
   /**
    * {@inheritDoc}
    */
-  public function getCancelText(): TranslatableMarkup {
+  public function getCancelText() {
     return t('Cancel');
   }
 
