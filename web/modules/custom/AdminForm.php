@@ -2,50 +2,45 @@
 
 namespace Drupal\sasha_cat\Form;
 
-use Drupal\Core\Ajax\AjaxResponse;
-use Drupal\Core\Ajax\MessageCommand;
 use Drupal\Core\Ajax\RedirectCommand;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\MessageCommand;
 use Drupal\Core\Url;
 use Drupal\file\Entity\File;
 
 /**
- * Form for editing cats.
+ * Contains \Drupal\sasha_cat\Form\AdminForm.
  *
- * @throw \Drupal\Core\Form\FormBase
+ * @file
  */
-class EditCats extends FormBase {
+
+/**
+ * Implements administration page for cats.
+ */
+class AdminForm extends FormBase {
 
   /**
-   * Cat to edit if any.
-   *
-   * @var int
+   * {@inheritdoc}
    */
-  protected int $id;
-
-  /**
-   * {@inheritDoc}
-   */
-  public function getFormId(): string {
-    return 'edit cat';
+  public function getFormId() {
+    return 'sasha_cat';
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $catID = NULL): array {
-    $this->id = $catID;
-    $query = \Drupal::database();
-    $data = $query
-      ->select('sasha_cat', 'edt')
-      ->condition('edt.id', $catID)
-      ->fields('edt', ['name', 'email', 'image', 'id'])
-      ->execute()->fetchAll();
+  public function buildForm(array $form, FormStateInterface $form_state) {
+    $form['item'] = [
+      '#type' => 'page_title',
+      '#title' => $this->t("You can add here a photo of your cat!"),
+    ];
+
     $form['adding_cat'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Your cat’s name:'),
-      '#default_value' => $data[0]->name,
+      '#placeholder' => $this->t('The name must be in range from 2 to 32 symbols'),
       '#required' => TRUE,
       '#maxlength' => 32,
       '#ajax' => [
@@ -56,11 +51,10 @@ class EditCats extends FormBase {
         ],
       ],
     ];
-
     $form['email'] = [
       '#type' => 'email',
       '#title' => $this->t('Your email:'),
-      '#default_value' => $data[0]->email,
+      '#placeholder' => $this->t('example@email.com'),
       '#required' => TRUE,
       '#ajax' => [
         'callback' => '::ajaxValidEmail',
@@ -70,23 +64,20 @@ class EditCats extends FormBase {
         ],
       ],
     ];
-
     $form['cat_image'] = [
       '#type' => 'managed_file',
       '#title' => $this->t('Your cat’s photo:'),
       '#description' => t('Please use only these extensions: jpeg, jpg, png'),
       '#upload_location' => 'public://images/',
-      '#default_value' => [$data[0]->image],
       '#required' => TRUE,
       '#upload_validators' => [
         'file_validate_extensions' => ['jpeg jpg png'],
         'file_validate_size' => [2097152],
       ],
     ];
-
     $form['submit'] = [
       '#type' => 'submit',
-      '#value' => $this->t('Edit'),
+      '#value' => $this->t('Add cat'),
       '#button_type' => 'primary',
       '#ajax' => [
         'callback' => '::setMessage',
@@ -99,7 +90,7 @@ class EditCats extends FormBase {
   }
 
   /**
-   * Function that validate Name field.
+   * Function that validate Name field on its length.
    */
   public function validateName(array &$form, FormStateInterface $form_state): bool {
     if ((mb_strlen($form_state->getValue('adding_cat')) < 2)) {
@@ -134,7 +125,7 @@ class EditCats extends FormBase {
   }
 
   /**
-   * Function that validate Email field with AJAX.
+   * Function that validate Email field with Ajax.
    */
   public function ajaxValidEmail(array &$form, FormStateInterface $form_state): AjaxResponse {
     $valid = $this->validateEmail($form, $form_state);
@@ -153,6 +144,7 @@ class EditCats extends FormBase {
    */
   public function validateImage(array &$form, FormStateInterface $form_state): bool {
     $picture = $form_state->getValue('cat_image');
+
     if (!empty($picture[0])) {
       return TRUE;
     }
@@ -160,9 +152,9 @@ class EditCats extends FormBase {
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state): bool {
+  public function validateForm(array &$form, FormStateInterface $form_state) {
     if ($this->validateName($form, $form_state) && $this->validateEmail($form, $form_state) && $this->validateImage($form, $form_state)) {
       return TRUE;
     }
@@ -172,7 +164,7 @@ class EditCats extends FormBase {
   }
 
   /**
-   * {@inheritDoc}
+   * {@inheritdoc}
    *
    * @throws \Exception
    */
@@ -187,13 +179,9 @@ class EditCats extends FormBase {
         'name' => $form_state->getValue('adding_cat'),
         'email' => $form_state->getValue('email'),
         'image' => $picture[0],
+        'date' => date('d-m-Y H:i:s'),
       ];
-      \Drupal::database()
-        ->update('sasha_cat')
-        ->condition('id', $this->id)
-        ->fields($cat)
-        ->execute();
-      $form_state->setRedirect('sasha.cats');
+      \Drupal::database()->insert('sasha_cat')->fields($cat)->execute();
     }
   }
 
@@ -211,7 +199,7 @@ class EditCats extends FormBase {
       $response->addCommand(new MessageCommand('Please, upload your cat image', ".null", ['type' => 'error']));
     }
     else {
-      $url = Url::fromRoute('sasha.cats');
+      $url = Url::fromRoute('admin.cats');
       $response->addCommand(new RedirectCommand($url->toString()));
       $response->addCommand(new MessageCommand('Congratulations! You added your cat!'));
     }
