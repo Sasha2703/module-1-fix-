@@ -11,7 +11,13 @@ use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Annotation @todo.
+ * Contains \Drupal\sasha_cat\Form\AdminForm.
+ *
+ * @file
+ */
+
+/**
+ * Implements administration page for cats.
  */
 class AdminForm extends ConfirmFormBase {
 
@@ -63,7 +69,7 @@ class AdminForm extends ConfirmFormBase {
    * {@inheritdoc}
    */
   public function getQuestion() {
-    return $this->t('TODO.');
+    return $this->t('Do you want to delete this Cat?');
   }
 
   /**

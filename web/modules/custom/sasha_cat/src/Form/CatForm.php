@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Annotation @todo.
+ * Implements an example form.
  */
 class CatForm extends FormBase {
 
