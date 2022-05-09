@@ -39,13 +39,6 @@ class DeleteCats extends ConfirmFormBase {
   /**
    * {@inheritDoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
-    parent::validateForm($form, $form_state);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $query = \Drupal::database();
     $query->delete('sasha_cat')

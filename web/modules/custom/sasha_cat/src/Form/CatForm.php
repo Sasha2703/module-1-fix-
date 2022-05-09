@@ -75,7 +75,7 @@ class CatForm extends FormBase {
     $form['cat_image'] = [
       '#type' => 'managed_file',
       '#title' => $this->t('Your cat’s photo:'),
-      '#description' => t('Please use only these extensions: jpeg, jpg, png'),
+      '#description' => $this->t('Please use only these extensions: jpeg, jpg, png'),
       '#upload_location' => 'public://images/',
       '#default_value' => [$data[0]->image],
       '#required' => TRUE,

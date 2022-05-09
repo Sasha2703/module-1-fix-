@@ -29,9 +29,14 @@ class AdminForm extends ConfirmFormBase {
       '#options' => $this->getCats(),
       '#empty' => $this->t('There are no items.'),
     ];
-    $form['submit'] = [
+    $form['actions']['submit'] = [
       '#type' => 'submit',
-      '#value' => $this->t('Delete'),
+      '#value' => $this->t('Delete selected'),
+      '#states' => [
+        'enabled' => [
+          ':input[name^="table"]' => ['checked' => TRUE],
+        ],
+      ],
     ];
     return $form;
   }
@@ -57,8 +62,13 @@ class AdminForm extends ConfirmFormBase {
     return $this->t('You really want to delete selected cat(s)?');
   }
 
-
-  public function getCats() {
+  /**
+   * Searches cats or one cat in db.
+   *
+   * @return array
+   *   Cat's objects array.
+   */
+  public function getCats(): array {
     $database = \Drupal::database();
     $result = $database->select('sasha_cat', 'sasha_cattb')
       ->fields('sasha_cattb', ['id', 'name', 'email', 'image', 'date'])
