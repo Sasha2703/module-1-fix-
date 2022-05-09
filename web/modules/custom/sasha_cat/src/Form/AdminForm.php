@@ -41,7 +41,6 @@ class AdminForm extends FormBase {
     $query->fields('sasha_cattb', ['id', 'name', 'email', 'image', 'date'])
       ->orderBy('id', 'DESC');
     $info = $query->execute()->fetchAll();
-    $info = json_decode(json_encode($info), TRUE);
     $headers = [
       t('Cat'),
       t('Image'),
