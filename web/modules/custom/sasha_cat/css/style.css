@@ -1,154 +1,60 @@
-.navbar-header {
-  margin: 0 10px;
-  width: 1000px;
-}
-.page-header {
-  font-family: 'Poppins', sans-serif;
-  color: black;
-  font-size: 30px;
-  font-weight: 300;
-}
-.button {
-  box-shadow: 0 3px 5px black;
-  background-color: #7a4ca9;
-  border-color: #7a4ca9;
-  text-decoration: none;
-}
-.button:hover {
-  box-shadow: 0 3px 5px black;
-  background-color: #7a4ca9;
-  border-color: #7a4ca9;
-  text-decoration: none;
-}
-.button:active {
-  box-shadow: 0 3px 5px black;
-  background-color: #7a4ca9;
-  border-color: #7a4ca9;
-  text-decoration: none;
-}
-.button:focus {
-  box-shadow: 0 3px 5px black;
-  background-color: #7a4ca9;
-  border-color: #7a4ca9;
-  text-decoration: none;
-}
-
-.cat-table {
-  display: flex;
-  flex-direction: column;
-  border: 2px solid;
-  margin-top: 40px;
-  padding: 25px;
+.sasha-cat-table {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border: thin solid lightgray;
   border-radius: 10px;
-  background-color: #d2c6df;
-}
-.cat-tb {
-  display: flex;
-}
-.cat-name {
-  margin: auto;
-}
-.cat-email {
-  margin: auto;
-}
-.cat-photo {
-  margin: auto 50px auto auto;
-}
-.cat-photo img {
-  width: 250px;
-  height: 250px;
-  border-radius: 20%;
-}
-.cat-photo img:hover {
-  opacity: 0.7;
-  cursor: pointer;
-  transition: 0.3s;
-}
-h3 {
-  font-family: 'Rubik Beastly', cursive;
-}
-h5 {
-  font-family: 'Poppins', sans-serif;
 }
 
-.cat-button {
+.sasha-cat-row {
   display: flex;
-  border-radius: 5px;
-  background-color: #a271d5;
-  padding: 4px 40px;
-  margin-bottom: 20px;
-  box-shadow: 1px 4px 6px;
-  text-decoration: none;
-}
-.cat-button:hover {
-  opacity: 0.7;
-  cursor: pointer;
-  text-decoration: none;
-}
-.cat-admin-buttons {
-  margin: auto 10px auto auto;
-}
-.cat-edit-btn {
-  margin: auto;
-  text-decoration: none;
-  font-size: 24px;
-  font-family: 'Poppins', sans-serif;
-  color: black;
-}
-.cat-edit-btn:hover {
-  color: black;
-  text-decoration: none;
-}
-.cat-delete-btn {
-  margin: auto;
-  text-decoration: none;
-  font-size: 24px;
-  font-family: 'Poppins', sans-serif;
-  color: black;
-}
-.cat-delete-btn:hover {
-  color: black;
-  text-decoration: none;
-}
-.ui-widget-overlay {
-  display: none;
-}
-.ui-dialog-buttonpane {
-  display: flex;
-}
-.ui-dialog-buttonset {
-  margin: auto;
-  display: flex;
-}
-.form-control .ui-button .ui-corner-all .ui-widget {
-  margin: 20px 30px;
-  height: 30px;
+  align-items: center;
+  justify-content: space-between;
+  column-gap: 10px;
+  padding: 10px;
 }
 
-.edit-cat {
+.sasha-cat-row:not(:last-child) {
+  border-bottom: thin solid lightgray;
+}
+
+.sasha-cat-image {
+  display: block;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.sasha-cat-image img {
+  display: block;
+}
+
+.sasha-cat-admin-buttons {
   display: flex;
   flex-direction: column;
+  justify-content: flex-end;
+  row-gap: 10px;
+  position: relative;
+  padding-right: 30px;
 }
-.form-submit {
-  margin: auto;
+
+.sasha-cat-admin-buttons .ajax-progress {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto 0;
 }
-tr {
-  display: flex;
+
+.sasha-cat-button {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 5px;
+  background-color: #793ba5;
+  text-align: center;
+  color: #f5f5f5;
+  text-decoration: none;
 }
-th {
-  margin: auto;
-}
-.cat-row:hover {
-  background-color: #d2c6df;
-}
-.cat-upper-row:hover {
-  background-color: #a271d5;
-}
-td {
-  font-size: 20px;
-  font-family: 'Poppins', sans-serif;
-  margin: auto;
-}
-.cats-list {
-  background-color: #d2c6df;
+
+.sasha-cat-button:hover {
+  color: #f5f5f5;
+  text-decoration: none;
 }

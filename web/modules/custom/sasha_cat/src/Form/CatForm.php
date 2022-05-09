@@ -3,17 +3,93 @@
 namespace Drupal\sasha_cat\Form;
 
 use Drupal\Core\Ajax\RedirectCommand;
+use Drupal\Core\Ajax\ReplaceCommand;
+use Drupal\Core\Cache\Cache;
+use Drupal\Core\Database\Connection;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Ajax\AjaxResponse;
-use Drupal\Core\Ajax\MessageCommand;
-use Drupal\file\Entity\File;
+use Drupal\Core\Render\MainContent\MainContentRendererInterface;
+use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Url;
+use Drupal\sasha_cat\Controller\SashaCatController;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Implements an example form.
+ * Annotation @todo.
  */
 class CatForm extends FormBase {
+
+  /**
+   * The renderer.
+   *
+   * @var \Drupal\Core\Render\RendererInterface
+   */
+  protected $renderer;
+
+  /**
+   * The database connection.
+   *
+   * @var \Drupal\Core\Database\Connection
+   */
+  protected $connection;
+
+  /**
+   * The file storage service.
+   *
+   * @var \Drupal\Core\Entity\EntityStorageInterface
+   */
+  protected $fileStorage;
+
+  /**
+   * The main content to AJAX Response renderer.
+   *
+   * @var \Drupal\Core\Render\MainContent\MainContentRendererInterface
+   */
+  protected $ajaxRenderer;
+
+  /**
+   * Constructs a new CatForm.
+   *
+   * @param \Drupal\Core\Database\Connection $connection
+   *   The database connection.
+   * @param \Drupal\Core\Entity\EntityStorageInterface $file_storage
+   *   The file storage service.
+   * @param \Drupal\Core\Render\MainContent\MainContentRendererInterface $ajax_renderer
+   *   The ajax renderer.
+   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   *   The current route match.
+   * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   The renderer.
+   */
+  public function __construct(
+    Connection $connection,
+    EntityStorageInterface $file_storage,
+    MainContentRendererInterface $ajax_renderer,
+    RouteMatchInterface $route_match,
+    RendererInterface $renderer
+  ) {
+    $this->connection = $connection;
+    $this->fileStorage = $file_storage;
+    $this->ajaxRenderer = $ajax_renderer;
+    $this->routeMatch = $route_match;
+    $this->renderer = $renderer;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('database'),
+      $container->get('entity_type.manager')->getStorage('file'),
+      $container->get('main_content_renderer.ajax'),
+      $container->get('current_route_match'),
+      $container->get('renderer')
+    );
+  }
 
   /**
    * ID of the item to edit.
@@ -32,68 +108,70 @@ class CatForm extends FormBase {
   /**
    * {@inheritDoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, string $id = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, $id = NULL) {
     $this->id = $id;
-    if (!is_null($id)) {
-      $query = \Drupal::database();
-      $data = $query
-        ->select('sasha_cat', 'edt')
-        ->condition('edt.id', $id)
-        ->fields('edt', ['name', 'email', 'image', 'id'])
-        ->execute()->fetchAll();
+    $cat_data = [];
+    if ($id) {
+      $cat_data = $this->connection
+        ->select('sasha_cat', 'sc')
+        ->condition('sc.id', $id)
+        ->fields('sc', ['cat_name', 'email', 'cat_image', 'id'])
+        ->execute()
+        ->fetchAssoc();
     }
-    $form['item'] = [
-      '#type' => 'page_title',
-      '#title' => $this->t("You can add here a photo of your cat!"),
+
+    $wrapper_id = 'sasha-cat-form-ajax';
+    $form['ajax_wrapper'] = [
+      '#type' => 'container',
+      '#id' => $wrapper_id,
     ];
 
-    $form['adding_cat'] = [
+    $form['ajax_wrapper']['cat_name'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Your cat’s name:'),
-      '#placeholder' => $this->t('The name must be in range from 2 to 32 symbols'),
+      '#placeholder' => $this->t(
+        'The name must be in range from 2 to 32 symbols'
+      ),
       '#required' => TRUE,
       '#maxlength' => 32,
-      '#default_value' => $data[0]->name,
-      '#ajax' => [
-        'callback' => '::ajaxValidName',
-        'event' => 'change',
-        'progress' => [
-          'type' => 'none',
-        ],
-      ],
+      '#default_value' => @$cat_data['cat_name'],
     ];
-    $form['email'] = [
+
+    $form['ajax_wrapper']['email'] = [
       '#type' => 'email',
       '#title' => $this->t('Your email:'),
       '#placeholder' => $this->t('example@email.com'),
       '#required' => TRUE,
-      '#default_value' => $data[0]->email,
-      '#ajax' => [
-        'callback' => '::ajaxValidEmail',
-        'event' => 'change',
-        'progress' => [
-          'type' => 'none',
-        ],
+      '#default_value' => @$cat_data['email'],
+      '#attributes' => [
+        'drupal-ajax-nodisable' => '',
+      ],
+      '#attached' => [
+        'library' => ['sasha_cat/ajax_plugin'],
       ],
     ];
-    $form['cat_image'] = [
+
+    $form['ajax_wrapper']['cat_image'] = [
       '#type' => 'managed_file',
       '#title' => $this->t('Your cat’s photo:'),
-      '#description' => t('Please use only these extensions: jpeg, jpg, png'),
-      '#upload_location' => 'public://images/',
-      '#default_value' => [$data[0]->image],
+      '#description' => $this->t(
+        'Please use only these extensions: jpeg, jpg, png'
+      ),
+      '#upload_location' => 'public://sasha_cat/',
+      '#default_value' => [(int) @$cat_data['cat_image']],
       '#required' => TRUE,
       '#upload_validators' => [
         'file_validate_extensions' => ['jpeg jpg png'],
         'file_validate_size' => [2097152],
       ],
     ];
-    $form['submit'] = [
+
+    $form['actions']['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Save'),
-      '#button_type' => 'primary',
       '#ajax' => [
-        'callback' => '::setMessage',
+        'callback' => '::ajaxSubmitForm',
+        'wrapper' => $wrapper_id,
         'progress' => [
           'type' => 'none',
         ],
@@ -103,65 +181,22 @@ class CatForm extends FormBase {
   }
 
   /**
-   * Function that validate Name field on its length.
+   * {@inheritDoc}
    */
-  public function validateName(array &$form, FormStateInterface $form_state): bool {
-    if ((mb_strlen($form_state->getValue('adding_cat')) < 2)) {
-      return FALSE;
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    if ((mb_strlen($form_state->getValue('cat_name')) < 2)) {
+      $form_state->setErrorByName(
+        'cat_name', $this->t('The minimum name length is 2 characters.')
+      );
     }
-    return TRUE;
-  }
 
-  /**
-   * Set messages of errors or success using ajax for the name field.
-   */
-  public function ajaxValidName(array &$form, FormStateInterface $form_state): AjaxResponse {
-    $valid = $this->validateName($form, $form_state);
-    $response = new AjaxResponse();
-    if ($valid) {
-      $response->addCommand(new MessageCommand('Your name is valid'));
+    // Use custom validation to meet the requirements of the specification.
+    $email = $form_state->getValue('email');
+    if (!preg_match('/^[A-Za-z_\-]+@\w+(?:\.\w+)+$/', $email)) {
+      $form_state->setErrorByName(
+        'email', $this->t('The email name can only contain latin letters, hyphens, and underscores.')
+      );
     }
-    else {
-      $response->addCommand(new MessageCommand('Your name is too short', ".null", ['type' => 'error']));
-    }
-    return $response;
-  }
-
-  /**
-   * Function that validate Email field.
-   */
-  public function validateEmail(array &$form, FormStateInterface $form_state): bool {
-    if (filter_var($form_state->getValue('email'), FILTER_VALIDATE_EMAIL)) {
-      return TRUE;
-    }
-    return FALSE;
-  }
-
-  /**
-   * Function that validate Email field with Ajax.
-   */
-  public function ajaxValidEmail(array &$form, FormStateInterface $form_state): AjaxResponse {
-    $valid = $this->validateEmail($form, $form_state);
-    $response = new AjaxResponse();
-    if ($valid) {
-      $response->addCommand(new MessageCommand('Your email is valid'));
-    }
-    else {
-      $response->addCommand(new MessageCommand('Your email is NOT valid', ".null", ['type' => 'error']));
-    }
-    return $response;
-  }
-
-  /**
-   * Function that validate Image field.
-   */
-  public function validateImage(array &$form, FormStateInterface $form_state): bool {
-    $picture = $form_state->getValue('cat_image');
-
-    if (!empty($picture[0])) {
-      return TRUE;
-    }
-    return FALSE;
   }
 
   /**
@@ -170,39 +205,90 @@ class CatForm extends FormBase {
    * @throws \Exception
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    if ($this->validateName($form, $form_state) && $this->validateEmail($form, $form_state) && $this->validateImage($form, $form_state)) {
-      $picture = $form_state->getValue('cat_image');
-      $file = File::load($picture[0]);
-      $file->setPermanent();
-      $file->save();
-
-      $cat = [
-        'name' => $form_state->getValue('adding_cat'),
-        'email' => $form_state->getValue('email'),
-        'image' => $picture[0],
-        'date' => date('d-m-Y H:i:s'),
-      ];
-      if (!is_null($this->id)) {
-        \Drupal::database()
-          ->update('sasha_cat')
-          ->condition('id', $this->id)
-          ->fields($cat)
-          ->execute();
-      }
-      else {
-        \Drupal::database()->insert('sasha_cat')->fields($cat)->execute();
+    // Remove old image if exists.
+    if ($this->id) {
+      $cat_image = $this->connection->select('sasha_cat', 'sc')
+        ->fields('sc', ['id'])
+        ->condition('sc.id', $this->id)
+        ->execute()
+        ->fetchField();
+      /** @var \Drupal\file\FileInterface $cat_image_file */
+      $cat_image_file = $this->fileStorage->load($cat_image);
+      if ($cat_image_file) {
+        $cat_image_file->setTemporary();
+        $cat_image_file->save();
       }
     }
+
+    // Set usage for new image.
+    $cat_image = $form_state->getValue('cat_image')[0];
+    /** @var \Drupal\file\FileInterface $cat_image_file */
+    $cat_image_file = $this->fileStorage->load($cat_image);
+    $cat_image_file->setPermanent();
+    $cat_image_file->save();
+
+    // Update or insert cat to database.
+    $cat_data = [
+      'cat_name' => $form_state->getValue('cat_name'),
+      'email' => $form_state->getValue('email'),
+      'cat_image' => $cat_image,
+      'created' => time(),
+    ];
+    $this->connection->merge('sasha_cat')
+      ->condition('id', $this->id)
+      ->fields($cat_data)
+      ->execute();
+    if ($this->id) {
+      $this->messenger()->addStatus($this->t('Cat edited.'));
+    }
+    else {
+
+      $this->messenger()->addStatus(
+        $this->t('Congratulations! You added your cat!'));
+    }
+    Cache::invalidateTags(['sasha_cat_table']);
+
+    // Reset form.
+    $user_input = &$form_state->getUserInput();
+    $internal_elements = $form_state->getCleanValueKeys();
+    foreach ($user_input as $key => $value) {
+      if (!in_array($key, $internal_elements)) {
+        unset($user_input[$key]);
+      }
+    }
+    $form_state->setRebuild();
   }
 
   /**
-   * Function that validate Name and Image field with Ajax.
+   * Callback for additional ajax commands on form submission.
+   *
+   * @param array $form
+   *   An associative array containing the structure of the form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The current request.
    */
-  public function setMessage(array &$form, FormStateInterface $form_state): AjaxResponse {
-    $response = new AjaxResponse();
-    $url = Url::fromRoute('sasha_cat.content');
-    $response->addCommand(new RedirectCommand($url->toString()));
-    $response->addCommand(new MessageCommand('Congratulations! You added your cat!'));
+  public function ajaxSubmitForm(array &$form, FormStateInterface $form_state, Request $request) {
+    // Render form with drupal messages.
+    /** @var \Drupal\Core\Ajax\AjaxResponse $response */
+    $response = $this
+      ->ajaxRenderer
+      ->renderResponse($form['ajax_wrapper'], $request, $this->routeMatch);
+
+    // Update cats table if success.
+    if (!$form_state::hasAnyErrors()) {
+      $cat_controller = SashaCatController::create(\Drupal::getContainer());
+      $response->addCommand(new ReplaceCommand('.sasha-cat-table', $cat_controller->buildCatTable()));
+
+      if ($this->id) {
+        $destination = $this->getRequest()->query->get('destination') ?: 'sasha_cat.content';
+        $destination = Url::fromRoute($destination)->toString();
+        $response->addCommand(new RedirectCommand($destination));
+
+      }
+    }
+
     return $response;
   }
 

@@ -1,4 +1,0 @@
-administer sasha_cat configuration:
-  title: 'Administer sasha_cat configuration'
-  description: 'Optional description.'
-  restrict access: true

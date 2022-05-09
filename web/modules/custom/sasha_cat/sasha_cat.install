@@ -16,7 +16,7 @@ function sasha_cat_schema(): array {
         'unsigned' => TRUE,
         'not null' => TRUE,
       ],
-      'name' => [
+      'cat_name' => [
         'type' => 'varchar',
         'length' => 32,
         'not null' => TRUE,
@@ -28,17 +28,15 @@ function sasha_cat_schema(): array {
         'not null' => TRUE,
         'default' => '',
       ],
-      'image' => [
+      'cat_image' => [
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
         'length' => 64,
       ],
-      'date' => [
-        'type' => 'varchar',
-        'length' => 255,
+      'created' => [
+        'type' => 'int',
         'not null' => TRUE,
-        'default' => '',
       ],
     ],
     'primary key' => [

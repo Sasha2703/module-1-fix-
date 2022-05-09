@@ -2,8 +2,10 @@
 
 namespace Drupal\sasha_cat\Controller;
 
-use Drupal\file\Entity\File;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Database\Connection;
+use Drupal\Core\Entity\EntityStorageInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides route responses for the sasha_cat module.
@@ -13,58 +15,89 @@ use Drupal\Core\Controller\ControllerBase;
 class SashaCatController extends ControllerBase {
 
   /**
-   * Cat to edit if any.
+   * The file storage service.
    *
-   * @var int
+   * @var \Drupal\Core\Entity\EntityStorageInterface
    */
-  protected int $id;
+  protected $fileStorage;
+
+  /**
+   * The database connection.
+   *
+   * @var \Drupal\Core\Database\Connection
+   */
+  protected $connection;
+
+  /**
+   * Constructs a new CatForm.
+   *
+   * @param \Drupal\Core\Database\Connection $connection
+   *   The database connection.
+   * @param \Drupal\Core\Entity\EntityStorageInterface $file_storage
+   *   The file storage service.
+   */
+  public function __construct(Connection $connection, EntityStorageInterface $file_storage) {
+    $this->connection = $connection;
+    $this->fileStorage = $file_storage;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('database'),
+      $container->get('entity_type.manager')->getStorage('file')
+    );
+  }
 
   /**
    * Builds the response.
    */
-  public function content() {
-    $form['sasha_cat'] = \Drupal::formBuilder()
-      ->getForm('Drupal\sasha_cat\Form\CatForm');
+  public function build() {
+    $cat_form = $this->formBuilder()->getForm('Drupal\sasha_cat\Form\CatForm');
     return [
-      '#theme' => 'cats',
-      '#form' => $form,
-      '#list' => $this->catTable(),
+      '#theme' => 'sasha_cat_page',
+      '#cat_form' => $cat_form,
+      '#cat_table' => $this->buildCatTable(),
     ];
   }
 
   /**
-   * Get data from database.
+   * Builds cats table.
    *
    * @return array
    *   Return markup array.
    */
-  public function catTable() {
-    $query = \Drupal::database();
-    $result = $query->select('sasha_cat', 'sasha_cattb')
-      ->fields('sasha_cattb', ['id', 'name', 'email', 'image', 'date'])
+  public function buildCatTable() {
+    $cats = $this->connection
+      ->select('sasha_cat', 'sc')
+      ->fields('sc', ['id', 'cat_name', 'email', 'cat_image', 'created'])
       ->orderBy('id', 'DESC')
-      ->execute()->fetchAll();
-    $data = [];
-    foreach ($result as $cat) {
-      $file = File::load($cat->image);
-      $uri = $file->getFileUri();
-      $photoCats = [
+      ->execute()
+      ->fetchAll(\PDO::FETCH_ASSOC);
+
+    // Build image.
+    foreach ($cats as &$cat) {
+      $cat_image_uri = $this->fileStorage
+        ->load($cat['cat_image'])
+        ->getFileUri();
+      $cat['cat_image'] = [
         '#theme' => 'image_style',
         '#style_name' => 'wide',
-        '#uri' => $uri,
+        '#uri' => $cat_image_uri,
         '#alt' => 'cat',
         '#title' => 'cat',
         '#width' => 255,
       ];
-      $data[] = [
-        'name' => $cat->name,
-        'email' => $cat->email,
-        'image' => $photoCats,
-        'date' => $cat->date,
-        'id' => $cat->id,
-      ];
     }
-    return $data;
+    return [
+      '#theme' => 'sasha_cat_table',
+      '#cats' => $cats,
+      '#cache' => [
+        'tags' => ['sasha_cat_table'],
+      ],
+    ];
   }
 
 }

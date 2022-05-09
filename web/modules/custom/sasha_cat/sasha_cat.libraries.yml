@@ -1,6 +1,13 @@
-# Custom module library for general purposes.
-sasha_cat_library:
+sasha_cat_table:
   css:
     theme:
-      css/style.css: {}
+      css/style.css: { }
 
+# This plugin allows you to disable the disabling of an element
+# when sent via ajax using the 'drupal-ajax-nodisable' attribute.
+ajax_plugin:
+  version: 1.x
+  js:
+    js/ajax-plugin.js: { }
+  dependencies:
+    - core/jquery
