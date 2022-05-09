@@ -7,7 +7,15 @@ use Drupal\file\Entity\File;
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
 
+/**
+ * Contains \Drupal\sasha_cat\Form\AdminForm.
+ *
+ * @file
+ */
 
+/**
+ * Implements administration page for cats.
+ */
 class AdminForm extends ConfirmFormBase {
 
   /**
