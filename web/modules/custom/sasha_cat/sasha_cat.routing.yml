@@ -2,7 +2,7 @@ sasha_cat.content:
   path: '/sasha-cat/cat'
   defaults:
     _title: 'You can add here a photo of your cat!'
-    _controller: '\Drupal\sasha_cat\Controller\SashaCatController::build'
+    _controller: '\Drupal\sasha_cat\Controller\SashaCatController::content'
   requirements:
     _permission: 'access content'
 
@@ -10,17 +10,27 @@ sasha_cat.delete:
   path: '/sasha-cat/cat/{id}/delete'
   defaults:
     _form: '\Drupal\sasha_cat\Form\DeleteCats'
-    _title: 'Delete cat'
+    _title: 'Do you want to delete this cat?'
   requirements:
-    _role: 'administrator'
+    _permission: 'access content'
+
 
 sasha_cat.edit:
   path: '/sasha-cat/cat/{id}/edit'
   defaults:
     _form: '\Drupal\sasha_cat\Form\CatForm'
-    _title: 'Edit cat'
+    _title: 'Do you want to edit this cat?'
   requirements:
+    _permission: 'administer sasha_cat configuration'
     _role: 'administrator'
+
+sasha_cat.settings_form:
+  path: '/admin/config/system/sasha-cat'
+  defaults:
+    _title: 'sasha-cat'
+    _form: 'Drupal\sasha_cat\Form\CatForm'
+  requirements:
+    _permission: 'administer sasha_cat configuration'
 
 sasha_cat.admin:
   path: '/admin/structure/cats-list'
@@ -28,12 +38,4 @@ sasha_cat.admin:
     _title: 'Cats list'
     _form: 'Drupal\sasha_cat\Form\AdminForm'
   requirements:
-    _permission: 'administer site configuration'
-
-sasha_cat.admin.edit:
-  path: '/admin/structure/cats-list/{id}/edit'
-  defaults:
-    _form: '\Drupal\sasha_cat\Form\CatForm'
-    _title: 'Edit cat'
-  requirements:
-    _role: 'administrator'
+    _permission: 'administer sasha_cat configuration'

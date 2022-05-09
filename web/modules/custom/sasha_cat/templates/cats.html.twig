@@ -1,0 +1,18 @@
+{{ attach_library('sasha_cat/sasha_cat_library') }}
+{{ form }}
+   {% for cat in list %}
+     <div class="cat-table">
+       <h5 class="cat-date">{{ cat.date }}</h5>
+       <div class="cat-tb">
+         <h3 class="cat-name">{{ cat.name }}</h3>
+         <h3 class="cat-email">{{ cat.email }}</h3>
+         <div class="cat-photo"><a href="{{ file_url(cat.image['#uri']) }}" target="_blank">{{ cat.image }}</a></div>
+         {% if user.hasPermission('administer nodes') %}
+           <div class="cat-admin-buttons">
+             <div class="cat-button admin-cat-edit"><a href="{{ path('sasha_cat.edit', {'id': cat.id}) }}" class="use-ajax cat-edit-btn" data-dialog-type="modal">Edit</a></div>
+             <div class="cat-button admin-cat-delete"><a href="{{ path('sasha_cat.delete', {'id': cat.id}) }}" class="use-ajax cat-delete-btn" data-dialog-type="modal">Delete</a></div>
+           </div>
+         {% endif %}
+       </div>
+     </div>
+   {% endfor %}

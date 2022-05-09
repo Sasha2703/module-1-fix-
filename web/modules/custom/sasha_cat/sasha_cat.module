@@ -10,15 +10,20 @@
  */
 function sasha_cat_theme($existing, $type, $theme, $path) {
   return [
-    'sasha_cat_page' => [
+    'cats' => [
+      'render' => 'form',
       'variables' => [
-        'cat_form' => NULL,
-        'cat_table' => [],
+        'form' => NULL,
+        'pager' => NULL,
+        'list' => [],
       ],
     ],
-    'sasha_cat_table' => [
+    'admin-cats' => [
+      'render' => 'form',
       'variables' => [
-        'cats' => [],
+        'form' => NULL,
+        'pager' => NULL,
+        'list' => [],
       ],
     ],
   ];

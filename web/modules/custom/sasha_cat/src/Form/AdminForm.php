@@ -2,64 +2,42 @@
 
 namespace Drupal\sasha_cat\Form;
 
-use Drupal\Core\Cache\Cache;
-use Drupal\Core\Database\Connection;
-use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Url;
+use Drupal\file\Entity\File;
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Url;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
-/**
- * Contains \Drupal\sasha_cat\Form\AdminForm.
- *
- * @file
- */
 
-/**
- * Implements administration page for cats.
- */
 class AdminForm extends ConfirmFormBase {
 
   /**
-   * The file storage service.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * {@inheritdoc}
    */
-  protected $fileStorage;
-
-  /**
-   * The database connection.
-   *
-   * @var \Drupal\Core\Database\Connection
-   */
-  protected $connection;
-
-  /**
-   * Constructs a new CatForm.
-   *
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $file_storage
-   *   The file storage service.
-   */
-  public function __construct(Connection $connection, EntityStorageInterface $file_storage) {
-    $this->connection = $connection;
-    $this->fileStorage = $file_storage;
+  public function buildForm($form, FormStateInterface $form_state): array {
+    $header_title = [
+      'id' => $this->t('id'),
+      'name' => $this->t('Name'),
+      'email' => $this->t('Email'),
+      'image' => $this->t('Image'),
+      'timestamp' => $this->t('Date Created'),
+      'delete' => $this->t('Delete'),
+      'edit' => $this->t('Edit'),
+    ];
+    $form['table'] = [
+      '#type' => 'tableselect',
+      '#header' => $header_title,
+      '#options' => $this->getCats(),
+      '#empty' => $this->t('There are no items.'),
+    ];
+    $form['submit'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('Delete'),
+    ];
+    return $form;
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('database'),
-      $container->get('entity_type.manager')->getStorage('file')
-    );
-  }
-
-  /**
-   * {@inheritdoc}
+   * {@inheritDoc}
    */
   public function getFormId() {
     return 'sasha_cat_admin';
@@ -68,139 +46,92 @@ class AdminForm extends ConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function getQuestion() {
-    return $this->t('Do you want to delete this Cat?');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCancelUrl() {
+  public function getCancelUrl(): Url {
     return new Url('sasha_cat.admin');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
-    if ($form_state->getValue('cat_table')) {
-      $form = parent::buildForm($form, $form_state);
-      $form['actions']['submit']['#submit'][] = '::confirmForm';
-      return $form;
-    }
+  public function getQuestion() {
+    return $this->t('You really want to delete selected cat(s)?');
+  }
 
-    $cats = $this->connection
-      ->select('sasha_cat', 'sc')
-      ->fields('sc', ['id', 'cat_name', 'email', 'cat_image', 'created'])
+
+  public function getCats() {
+    $database = \Drupal::database();
+    $result = $database->select('sasha_cat', 'sasha_cattb')
+      ->fields('sasha_cattb', ['id', 'name', 'email', 'image', 'date'])
       ->orderBy('id', 'DESC')
-      ->execute()
-      ->fetchAllAssoc('id', \PDO::FETCH_ASSOC);
-    $destination = $this->getRouteMatch()->getRouteName();
-    foreach ($cats as &$cat) {
-      // Build image.
-      $cat_image_uri = $this->fileStorage
-        ->load($cat['cat_image'])
-        ->getFileUri();
-      $cat['cat_image'] = [
-        'data' => [
-          '#theme' => 'image_style',
-          '#style_name' => 'wide',
-          '#uri' => $cat_image_uri,
-          '#alt' => 'cat',
-          '#title' => 'cat',
-          '#width' => 255,
+      ->execute();
+    $cats = [];
+    foreach ($result as $cat) {
+      $cats[] = [
+        'id' => $cat->id,
+        'name' => $cat->name,
+        'email' => $cat->email,
+        'image' => [
+          'data' => [
+            '#theme' => 'image_style',
+            '#style_name' => 'thumbnail',
+            '#uri' => File::load($cat->image)->getFileUri(),
+            '#attributes' => [
+              'alt' => $cat->name,
+              'title' => $cat->name,
+            ],
+          ],
         ],
-      ];
-
-      // Format date.
-      $cat['created'] = date('d-m-Y H:i:s', $cat['created']);
-
-      // Build operations.
-      $operation_params = [
-        'id' => $cat['id'],
-        'destination' => $destination,
-      ];
-      $edit_link = [
-        'title' => $this->t('Edit'),
-        'url' => Url::fromRoute('sasha_cat.admin.edit', $operation_params),
-      ];
-      $cat['operations'] = [
-        'data' => [
-          '#type' => 'dropbutton',
-          '#links' => [
-            'edit' => $edit_link,
+        'timestamp' => date($cat->date),
+        'edit' => [
+          'data' => [
+            '#type' => 'link',
+            '#title' => $this->t('Edit'),
+            '#url' => Url::fromUserInput("/sasha-cat/cat/$cat->id/edit"),
+            '#options' => [
+              'attributes' => [
+                'class' => 'button',
+                'data-dialog-options' => '{ "title":"Edit cat information"}',
+              ],
+            ],
+          ],
+        ],
+        'delete' => [
+          'data' => [
+            '#type' => 'link',
+            '#title' => $this->t('Delete'),
+            '#url' => Url::fromRoute('sasha_cat.delete', ['id' => $cat->id]),
+            '#options' => [
+              'attributes' => [
+                'class' => ['button', 'use-ajax'],
+                'data-dialog-type' => 'modal',
+              ],
+            ],
           ],
         ],
       ];
     }
-
-    $form['cat_table'] = [
-      '#type' => 'tableselect',
-      '#empty' => $this->t('Empty.'),
-      '#options' => $cats,
-      '#header' => [
-        'cat_name' => $this->t('Cat name'),
-        'email' => $this->t('Email'),
-        'cat_image' => $this->t('Cat image'),
-        'created' => $this->t('Created'),
-        'operations' => $this->t('Operations'),
-      ],
-    ];
-    $form['actions']['submit'] = [
-      '#type' => 'submit',
-      '#value' => $this->t('Delete selected'),
-      '#states' => [
-        'enabled' => [
-          ':input[name^="cat_table"]' => ['checked' => TRUE],
-        ],
-      ],
-    ];
-    return $form;
+    return $cats;
   }
 
   /**
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $form_state->set('ids', $form_state->getValue('cat_table'));
-    $form_state->setRebuild();
-  }
-
-  /**
-   * Confirmation form submission handler.
-   *
-   * @param array $form
-   *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   *
-   * @throws \Drupal\Core\Entity\EntityStorageException
-   */
-  public function confirmForm(array &$form, FormStateInterface $form_state) {
-    $ids = $form_state->get('ids');
-
-    // Cleanup cat images.
-    $query = $this->connection
-      ->select('sasha_cat', 'sc')
-      ->fields('sc', ['cat_image'])
-      ->condition('id', $ids, 'IN')
-      ->execute();
-    foreach ($query as $cat) {
-      $cat_image_file = $this->fileStorage->load($cat->cat_image);
-      if ($cat_image_file) {
-        $cat_image_file->setTemporary();
-        $cat_image_file->save();
+    $rows = $form_state->getCompleteForm()['table']['#value'];
+    if ($rows) {
+      $id = [];
+      foreach ($rows as $i) {
+        $id[] = $form['table']['#options'][$i]['id'];
       }
+      $database = \Drupal::database();
+      $database->delete('sasha_cat')
+        ->condition('id', $id, 'IN')
+        ->execute();
+      \Drupal::messenger()->addStatus('Successfully deleted.');
     }
-
-    // Delete cats from database.
-    $this->connection
-      ->delete('sasha_cat')
-      ->condition('id', $ids, 'IN')
-      ->execute();
-
-    $this->messenger()->addMessage($this->t('Deleted!'));
-    Cache::invalidateTags(['sasha_cat_table']);
+    else {
+      $this->messenger()->addMessage($this->t("No rows selected to delete"), 'error');
+    }
   }
 
 }

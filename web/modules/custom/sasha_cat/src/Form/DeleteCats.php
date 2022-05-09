@@ -2,9 +2,9 @@
 
 namespace Drupal\sasha_cat\Form;
 
-use Drupal\Core\Cache\Cache;
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 
 /**
@@ -25,7 +25,7 @@ class DeleteCats extends ConfirmFormBase {
    * {@inheritDoc}
    */
   public function getFormId() {
-    return 'sasha_cat_delete';
+    return 'delete_cat';
   }
 
   /**
@@ -39,14 +39,20 @@ class DeleteCats extends ConfirmFormBase {
   /**
    * {@inheritDoc}
    */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    parent::validateForm($form, $form_state);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    \Drupal::database()
-      ->delete('sasha_cat')
+    $query = \Drupal::database();
+    $query->delete('sasha_cat')
       ->condition('id', $this->id)
       ->execute();
-    Cache::invalidateTags(['sasha_cat_table']);
-    $this->messenger()->addStatus('You deleted your cat.');
-    $form_state->setRedirectUrl($this->getCancelUrl());
+    \Drupal::messenger()->addStatus('You deleted your cat');
+    $form_state->setRedirect('sasha_cat.content');
   }
 
   /**
@@ -60,15 +66,14 @@ class DeleteCats extends ConfirmFormBase {
    * {@inheritDoc}
    */
   public function getCancelUrl() {
-    $destination = \Drupal::request()->query->get('destination') ?? 'sasha_cat.content';
-    return new Url($destination);
+    return new Url('sasha_cat.content');
   }
 
   /**
    * {@inheritDoc}
    */
   public function getDescription() {
-    return $this->t('Do you want to delete?');
+    return $this->t('Do you want to delete ?');
   }
 
   /**
@@ -76,6 +81,13 @@ class DeleteCats extends ConfirmFormBase {
    */
   public function getConfirmText() {
     return $this->t('Delete');
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public function getCancelText() {
+    return t('Cancel');
   }
 
 }
